@@ -1,74 +1,208 @@
-"""Instance generator for the week-3 studio (8-puzzle). Run once at build time;
-commits ``instances.json`` alongside. Deterministic (SEED=20260807).
+"""Generador de instancias para el estudio de la semana 3 (8-puzzle).
 
-Method is exactly the notebook's appendix: an exhaustive BFS *backwards from the
-goal* labels every one of the 181 440 reachable states with its true optimal
-depth. We then sample PER_DEPTH instances at each target depth. Because depths are
-read off the exhaustive BFS, every instance's optimal solution length is exact --
-never trust a hand-labelled puzzle depth, including these.
+Ejecutar una sola vez durante la generación; guarda ``instances.json``
+en el mismo directorio. Determinístico (SEED=20260807).
 
-The four canonical notebook instances (D8, D12, D16 -> their matching buckets)
-are pinned as the first entry of their depth so the notebook data appears
-verbatim in the bank.
+El método es exactamente el del apéndice del notebook: una búsqueda BFS exhaustiva
+*hacia atrás desde el estado objetivo* etiqueta cada uno de los 181 440 estados
+alcanzables con su verdadera profundidad óptima.
+
+Luego muestreamos PER_DEPTH instancias para cada profundidad objetivo. Debido a que
+las profundidades se obtienen directamente de la BFS exhaustiva, la longitud óptima
+de la solución de cada instancia es exacta; nunca se debe confiar en una profundidad
+de un puzzle etiquetada manualmente, incluyendo estas.
+
+Las cuatro instancias canónicas del notebook (D8, D12, D16 -> sus respectivos grupos)
+se fijan como la primera entrada de su profundidad correspondiente, de modo que los
+datos del notebook aparezcan literalmente en el banco de instancias.
 """
 import json
 import random
 from collections import deque
 from pathlib import Path
 
+# Importamos del archivo search.py:
+# - EightPuzzle: la clase que representa el problema del 8-puzzle.
+# - GOAL: el estado objetivo.
+# - D8, D12, D16: estados conocidos con profundidad óptima 8, 12 y 16.
 from search import EightPuzzle, GOAL, D8, D12, D16
 
+
+# Semilla fija para que la selección aleatoria sea reproducible.
+# Esto significa que, si ejecutamos el programa varias veces,
+# se elegirán los mismos estados.
 SEED = 20260807
-DEPTHS = [4, 8, 12, 16]      # plan Session 3B, Task 3
+
+# Profundidades óptimas que queremos incluir en nuestro conjunto de instancias.
+DEPTHS = [4, 8, 12, 16]
+
+# Número de instancias que queremos seleccionar por cada profundidad.
 PER_DEPTH = 10
-PINNED = {8: D8, 12: D12, 16: D16}   # notebook constants, verbatim
+
+# Estados "fijados" que queremos conservar obligatoriamente
+# porque ya aparecen en el notebook.
+PINNED = {
+    8: D8,
+    12: D12,
+    16: D16
+}
 
 
 def true_depths():
-    """Exhaustive BFS backwards from GOAL. Returns {state: optimal_depth}."""
+    """
+    Realiza una BFS exhaustiva empezando desde GOAL y avanzando hacia atrás.
+
+    Retorna:
+        Un diccionario de la forma:
+        {estado: profundidad_optima}
+
+    La profundidad representa el número mínimo de movimientos
+    necesarios para llegar desde ese estado hasta GOAL.
+    """
+
+    # El estado objetivo tiene distancia 0 respecto de sí mismo.
     dist = {GOAL: 0}
+
+    # deque se usa como una cola FIFO para implementar BFS.
+    # Empezamos colocando GOAL en la cola.
     q = deque([GOAL])
+
+    # Creamos un objeto EightPuzzle para poder usar sus métodos
+    # actions() y result().
     pz = EightPuzzle(GOAL)
+
+    # Mientras existan estados pendientes por explorar...
     while q:
+
+        # Extraemos el primer estado de la cola.
+        # Esto mantiene el comportamiento FIFO de BFS.
         s = q.popleft()
+
+        # Obtenemos todas las acciones válidas desde el estado s.
         for a in pz.actions(s):
+
+            # Aplicamos la acción a para obtener un nuevo estado t.
             t = pz.result(s, a)
+
+            # Si todavía no hemos visitado ese estado...
             if t not in dist:
+
+                # Su profundidad es una unidad mayor que la de su padre.
                 dist[t] = dist[s] + 1
+
+                # Lo agregamos a la cola para explorarlo después.
                 q.append(t)
+
+    # Retornamos el diccionario con todos los estados alcanzables
+    # y su profundidad óptima.
     return dist
 
 
 def main():
+    # Calculamos la profundidad óptima de todos los estados alcanzables.
     dist = true_depths()
-    print(f"reachable states: {len(dist):,}   hardest: {max(dist.values())} moves")
 
+    # Mostramos cuántos estados fueron encontrados
+    # y cuál es la profundidad máxima del 8-puzzle.
+    print(
+        f"reachable states: {len(dist):,}   "
+        f"hardest: {max(dist.values())} moves"
+    )
+
+    # Creamos un diccionario para agrupar estados según su profundidad.
+    #
+    # Ejemplo:
+    # {
+    #   4:  [estados con profundidad 4],
+    #   8:  [estados con profundidad 8],
+    #   12: [estados con profundidad 12],
+    #   16: [estados con profundidad 16]
+    # }
     by_depth = {d: [] for d in DEPTHS}
+
+    # Recorremos todos los estados encontrados por BFS.
     for state, d in dist.items():
+
+        # Solo guardamos estados cuya profundidad
+        # está dentro de DEPTHS.
         if d in by_depth:
             by_depth[d].append(state)
 
+    # Creamos un generador pseudoaleatorio usando una semilla fija.
+    # Gracias a SEED, el resultado será siempre reproducible.
     rng = random.Random(SEED)
-    out = {"seed": SEED, "depths": DEPTHS, "per_depth": PER_DEPTH, "instances": {}}
+
+    # Diccionario que finalmente será guardado como JSON.
+    out = {
+        "seed": SEED,
+        "depths": DEPTHS,
+        "per_depth": PER_DEPTH,
+        "instances": {}
+    }
+
+    # Procesamos cada profundidad deseada.
     for d in DEPTHS:
-        pool = sorted(by_depth[d])           # deterministic order before shuffle
+
+        # Ordenamos los estados primero para garantizar un orden inicial
+        # determinista antes de mezclarlos.
+        pool = sorted(by_depth[d])
+
+        # Mezclamos los estados de manera pseudoaleatoria.
         rng.shuffle(pool)
+
+        # Elegimos las primeras PER_DEPTH instancias.
         chosen = pool[:PER_DEPTH]
+
+        # Si existe una instancia PINNED para esta profundidad
+        # y no fue seleccionada aleatoriamente...
         if d in PINNED and PINNED[d] not in chosen:
+
+            # La ponemos obligatoriamente al inicio
+            # y completamos el resto con otras instancias.
             chosen = [PINNED[d]] + chosen[:PER_DEPTH - 1]
-        elif d in PINNED:                    # move the pinned one to the front
+
+        # Si la instancia PINNED ya estaba dentro de chosen...
+        elif d in PINNED:
+
+            # La quitamos de su posición actual.
             chosen.remove(PINNED[d])
+
+            # Y la movemos al primer lugar.
             chosen = [PINNED[d]] + chosen
-        # sanity: every chosen instance really has this optimal depth
+
+        # Verificación de seguridad:
+        # comprobamos que cada estado seleccionado
+        # realmente tenga la profundidad óptima esperada.
         for st in chosen:
             assert dist[st] == d, (st, dist[st], d)
+
+        # Convertimos cada tupla de estado en lista
+        # porque JSON trabaja naturalmente con listas.
         out["instances"][str(d)] = [list(st) for st in chosen]
 
+    # Construimos la ruta del archivo instances.json
+    # en la misma carpeta donde está este script.
     dest = Path(__file__).with_name("instances.json")
+
+    # Convertimos el diccionario out a formato JSON
+    # y lo escribimos en el archivo.
+    #
+    # indent=2 sirve para que el JSON quede ordenado y legible.
     dest.write_text(json.dumps(out, indent=2))
+
+    # Contamos cuántas instancias fueron guardadas en total.
     n = sum(len(v) for v in out["instances"].values())
-    print(f"wrote {dest} -- {n} instances across depths {DEPTHS}")
+
+    # Mostramos un mensaje indicando dónde se guardó el archivo
+    # y cuántas instancias contiene.
+    print(
+        f"wrote {dest} -- {n} instances across depths {DEPTHS}"
+    )
 
 
+# Esta condición verifica si el archivo está siendo ejecutado directamente.
+#
+# Si lo ejecutamos como script, se llama a main().
+# Si se importa desde otro archivo, main() no se ejecuta automáticamente.
 if __name__ == "__main__":
     main()

@@ -66,30 +66,62 @@ def utility_based(move_cost=1, suck_cost=2, clean_reward=3):
 # socket. You supply the model call; you must handle malformed output and LOG
 # every parse failure (it belongs on the scorecard — axis 8).
 #
-#   from aicourse.llm import LLM
-#   model = LLM()  # your configured local backend
+from aicourse.llm import LLM
+model = LLM()  # your configured local backend
 #
-#   PROMPT = """You control a vacuum robot in a 2-room world.
-#   Rooms 0 and 1. Each is Clean or Dirty.
-#   Actions: Left, Right, Suck, NoOp.
-#   History of (percept, action) so far:
-#   {history}
-#   Current percept: location={loc}, status={status}
-#   Reply with exactly one action word and nothing else."""
-#
-#   def parse_action(raw):
-#       # must survive "Suck.", "I would suck", or a paragraph of reasoning.
-#       ...  # return one of Left/Right/Suck/NoOp, or None on failure (log it!)
-#
-#   def llm_agent(history):
-#       def agent(percept):
-#           loc, dirty = percept
-#           resp = model.complete(PROMPT.format(history=fmt(history),
-#                                               loc=loc,
-#                                               status="Dirty" if dirty else "Clean"))
-#           return parse_action(resp.text)
-#       return agent
-#
+PROMPT = """You control a vacuum robot in a 2-room world.
+Rooms 0 and 1. Each is Clean or Dirty.
+Actions: Left, Right, Suck, NoOp.
+History of (percept, action) so far:
+{history}
+Current percept: location={loc}, status={status}
+Reply with exactly one action word and nothing else."""
+
+def parse_action(raw):
+    actions = ["Left", "Right", "Suck", "NoOp"]
+
+    text = raw.strip()
+
+    for action in actions:
+        if action.lower() in text.lower():
+            return action
+
+    print("PARSE FAILURE:", raw)
+    return None
+
+
+def fmt(history):
+    return "\n".join(
+        f"{percept} -> {action}"
+        for percept, action in history
+    )
+
+
+def llm_agent(history):
+    def agent(percept):
+        loc, dirty = percept
+
+        resp = model.complete(
+            PROMPT.format(
+                history=fmt(history),
+                loc=loc,
+                status="Dirty" if dirty else "Clean"
+            )
+        )
+
+        action = parse_action(resp.text)
+
+        if action is None:
+            action = "NoOp"
+
+        history.append((percept, action))
+
+        return action
+
+    return agent
+
+
+
 # Run the same 8 configs; run ONE config 5x and count distinct action sequences
 # (reproducibility — axis 5, made visceral). Compare to the four classical agents.
 
