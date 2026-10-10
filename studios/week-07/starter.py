@@ -1,83 +1,263 @@
-"""Week 7 studio — Task 1 starter (a sound Wumpus agent).
-
-Fill in the functions below, then run ``python3 test_dpll.py``. All required
-tests must pass, INCLUDING ``test_reckless_agent_is_unsound`` — which asserts
-that an agent WITHOUT the entailment check moves to a square that is not
-provably safe. A guarantee you cannot watch fail is not a guarantee you
-understood: the sound agent structurally cannot make that error, and the test
-proves the reckless one does.
-
-The engine (DPLL, ``entails``, the Wumpus physics) is provided in ``dpll.py``.
-You are writing the *agent* — the ASK step of perceive → TELL → ASK → act — on
-top of it. Everything you need is ``entails`` and the ``Pv`` proposition helper.
 """
+Week 7 — Tarea 1: agente Wumpus lógicamente correcto (SOUND).
+
+Completa las funciones de este archivo y luego ejecuta:
+
+    python3 test_dpll.py
+
+Todas las pruebas deben pasar, INCLUYENDO:
+
+    test_reckless_agent_is_unsound
+
+Esta prueba comprueba que un agente que NO utiliza la verificación por
+entailment puede moverse hacia una casilla que no está demostrada como segura.
+
+La idea importante es poder observar cómo falla una garantía:
+el agente SOUND está construido de forma que solo puede moverse hacia
+casillas cuya seguridad ha sido demostrada.
+
+En cambio, el agente reckless (imprudente) no hace esa comprobación
+y el test demuestra que puede cometer ese error.
+
+El motor lógico ya está implementado en dpll.py. Allí se encuentran:
+
+- DPLL
+- entails()
+- las reglas físicas del mundo de Wumpus
+
+Aquí NO estamos implementando nuevamente el razonador lógico.
+
+Estamos construyendo el AGENTE encima de ese motor, específicamente
+el paso ASK del ciclo:
+
+    percibir → TELL → ASK → actuar
+
+Todo lo que necesitamos para esta tarea es:
+
+- entails() -> para preguntar qué puede demostrar la KB
+- Pv()      -> para representar la proposición "hay un pozo"
+"""
+
 from dpll import Pv, entails
 
 
-# ---- Task 1: the ASK step ---------------------------------------------------
-# Each of these asks the KB ONE question via the central identity.
+# ---- Tarea 1: paso ASK -------------------------------------------------------
+# Cada una de estas funciones hace UNA pregunta a la base de conocimiento (KB)
+# utilizando entailment lógico.
 
 def provably_safe(kb, x, y) -> bool:
-    """Does the KB PROVE there is no pit at (x, y)?  i.e.  KB ⊨ ¬P(x,y).
-
-    Use ``entails(kb, [frozenset({-Pv(x, y)})])``. Note the sign: ¬P(x,y) is the
-    literal ``-Pv(x, y)`` wrapped as a one-clause CNF.
     """
-    # TODO: return whether KB entails ¬P(x,y)
-    raise NotImplementedError
+    ¿La KB DEMUESTRA que NO existe un pozo en (x, y)?
+
+    En lógica:
+
+        KB ⊨ ¬P(x,y)
+
+    Utilizamos:
+
+        entails(kb, [frozenset({-Pv(x, y)})])
+
+    Importante:
+    Pv(x,y) representa P(x,y): "hay un pozo".
+
+    Por lo tanto:
+
+        -Pv(x,y)
+
+    representa:
+
+        ¬P(x,y): "NO hay un pozo".
+
+    Se coloca dentro de frozenset porque la conclusión
+    debe expresarse como una cláusula CNF.
+    """
+
+    # Preguntamos si la KB implica lógicamente:
+    # "no existe un pozo en (x,y)".
+    return entails(
+        kb,
+        [frozenset({-Pv(x, y)})]
+    )
 
 
 def provably_pit(kb, x, y) -> bool:
-    """Does the KB PROVE there is a pit at (x, y)?  i.e.  KB ⊨ P(x,y)."""
-    # TODO: return whether KB entails P(x,y)
-    raise NotImplementedError
+    """
+    ¿La KB DEMUESTRA que existe un pozo en (x, y)?
+
+    En lógica:
+
+        KB ⊨ P(x,y)
+    """
+
+    # Pv(x,y) es positivo porque ahora preguntamos:
+    # "¿La KB puede demostrar que SÍ existe un pozo?"
+    return entails(
+        kb,
+        [frozenset({Pv(x, y)})]
+    )
 
 
-# ---- Task 1: the act step, two ways -----------------------------------------
+# ---- Tarea 1: paso ACT, de dos maneras --------------------------------------
 
 def sound_frontier(kb, squares) -> list:
-    """The SOUND agent. Return only the squares that are PROVED safe.
-
-    This is the whole point of the week: the agent moves only where it can prove
-    there is no pit. If nothing is proved safe it returns [] — and an honest
-    agent then stops or takes a *declared* risk. It never treats UNKNOWN as safe.
     """
-    # TODO: return [sq for sq in squares if provably_safe(kb, *sq)]
-    raise NotImplementedError
+    Agente SOUND (lógicamente correcto).
+
+    Devuelve únicamente las casillas que están
+    DEMOSTRADAS como seguras.
+
+    Este es el punto principal de la semana:
+
+    el agente solo se mueve a una casilla si puede demostrar:
+
+        KB ⊨ ¬P(x,y)
+
+    Si ninguna casilla está demostrada como segura,
+    devuelve una lista vacía [].
+
+    Un agente correcto puede entonces detenerse
+    o decidir asumir un riesgo de forma explícita.
+
+    Lo importante es que NUNCA considera UNKNOWN como SAFE.
+    """
+
+    # Recorremos todas las casillas candidatas.
+    #
+    # Solo conservamos aquellas donde provably_safe()
+    # devuelve True.
+    return [
+        sq
+        for sq in squares
+        if provably_safe(kb, *sq)
+    ]
 
 
 def reckless_frontier(kb, squares) -> list:
-    """The UNSOUND agent — the mistake, implemented on purpose so we can watch it.
-
-    It skips the entailment check and moves anywhere NOT proved to be a pit,
-    i.e. it treats UNKNOWN as safe. This is exactly the error the LLM makes in
-    Task 2: "probably safe" is not "provably safe." An agent that acts on it dies
-    the first time UNKNOWN hides a pit.
     """
-    # TODO: return [sq for sq in squares if not provably_pit(kb, *sq)]
-    raise NotImplementedError
+    Agente UNSOUND (imprudente).
+
+    Este agente representa el ERROR que queremos observar.
+
+    En vez de preguntar:
+
+        "¿Puedo DEMOSTRAR que la casilla es segura?"
+
+    pregunta solamente:
+
+        "¿Puedo demostrar que existe un pozo?"
+
+    y si la respuesta es NO, entra.
+
+    Por lo tanto trata UNKNOWN como SAFE.
+
+    Pero:
+
+        "No puedo demostrar que hay un pozo"
+
+    NO significa:
+
+        "Puedo demostrar que no hay un pozo".
+
+    Este es también el tipo de error que puede cometer
+    un LLM en la Tarea 2:
+
+        "probablemente seguro"
+
+    no significa:
+
+        "demostrablemente seguro".
+
+    Si UNKNOWN realmente contiene un pozo,
+    este agente puede morir al entrar.
+    """
+
+    # Incluimos cualquier casilla que NO esté
+    # demostrada explícitamente como pozo.
+    #
+    # El problema es que esto incluye también UNKNOWN.
+    return [
+        sq
+        for sq in squares
+        if not provably_pit(kb, *sq)
+    ]
 
 
-# ---- Task 2 sketch (the LLM as the reasoner) --------------------------------
-# See README.md §"Task 2". Give an LLM the SAME percepts in natural language and
-# score its "certainly safe" claims for SOUNDNESS against ``sound_frontier``:
-# any square it calls safe that is not in sound_frontier(kb, frontier) is an
-# unsound claim — the failure that matters. Record every one in the Failure Atlas.
+# ---- Tarea 2: esquema — el LLM como razonador -------------------------------
+#
+# En la Tarea 2 se le dan al LLM exactamente las MISMAS percepciones,
+# pero expresadas en lenguaje natural.
+#
+# Luego se comparan las casillas que el LLM afirma que son
+# "ciertamente seguras" contra:
+#
+#     sound_frontier(kb, frontier)
+#
+# Si el LLM declara segura una casilla que NO aparece
+# en sound_frontier(), entonces realizó una afirmación UNSOUND.
+#
+# Es decir, afirmó más de lo que la evidencia lógica permite demostrar.
+#
+# Este es el error importante que debe registrarse
+# en el Failure Atlas.
 
 
 if __name__ == "__main__":
-    from dpll import kb_from_percepts, classify, load_scenarios
+
+    # Importamos herramientas adicionales solo para la demostración.
+    from dpll import (
+        kb_from_percepts,
+        classify,
+        load_scenarios
+    )
+
+    # Cargamos el escenario del mundo de Wumpus.
     sc = load_scenarios()["wumpus"]
+
+    # Percepciones conocidas por el agente.
     base = sc["base_percepts"]
-    frontier = [tuple(s) for s in sc["frontier"]]
+
+    # Casillas de frontera que podrían explorarse.
+    # Las convertimos a tuplas (x, y).
+    frontier = [
+        tuple(s)
+        for s in sc["frontier"]
+    ]
+
+    # Construimos la base de conocimiento (KB)
+    # a partir de las percepciones.
     kb = kb_from_percepts(base)
 
-    print("Percepts: (1,1) no breeze, (2,1) breeze.\n")
-    for (x, y) in frontier:
-        print(f"  ({x},{y}): {classify(kb, x, y)}")
+    print(
+        "Percepciones: "
+        "(1,1) sin brisa, "
+        "(2,1) con brisa.\n"
+    )
 
-    try:
-        print("\nsound_frontier :", sound_frontier(kb, frontier))
-        print("reckless_frontier:", reckless_frontier(kb, frontier))
-    except NotImplementedError:
-        print("\n  (implement sound_frontier / reckless_frontier to compare)")
+    # Clasificamos cada casilla de la frontera.
+    #
+    # Puede resultar:
+    # SAFE    -> demostrablemente segura
+    # PIT     -> demostrablemente contiene pozo
+    # UNKNOWN -> la KB no puede demostrar ninguna de las dos
+    for (x, y) in frontier:
+
+        print(
+            f"  ({x},{y}): "
+            f"{classify(kb, x, y)}"
+        )
+
+    # El agente SOUND solo entra donde puede
+    # demostrar que NO existe un pozo.
+    print(
+        "\nsound_frontier :",
+        sound_frontier(kb, frontier)
+    )
+
+    # El agente reckless entra en cualquier casilla
+    # donde no se haya demostrado explícitamente un pozo.
+    #
+    # Por eso también puede incluir UNKNOWN.
+    print(
+        "reckless_frontier:",
+        reckless_frontier(kb, frontier)
+    )

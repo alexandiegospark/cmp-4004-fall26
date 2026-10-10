@@ -2,188 +2,188 @@
 marp: true
 theme: default
 paginate: true
-header: 'CMP-4004 · Week 7 · Propositional Logic & SAT'
+header: 'CMP-4004 · Semana 7 · Lógica Proposicional y SAT'
 ---
 
 <!--
-Week 7 Session A. Mini-lecture budget: 25 minutes.
-Source: 05_Planning.pptx slides 1-9. Beats per lesson plan: KB agents (4) →
-syntax/semantics (5) → the central identity (6) → inference rules (5) →
-limitations (5). CHECKPOINT 1 IS THIS WEEK. Lesson plan: ../../weeks/week-07.md
+Semana 7 Sesión A. Presupuesto de mini-clase: 25 minutos.
+Fuente: 05_Planning.pptx diapositivas 1-9. Ritmo según el plan de clase: agentes con KB (4) →
+sintaxis/semántica (5) → la identidad central (6) → reglas de inferencia (5) →
+limitaciones (5). EL CHECKPOINT 1 ES ESTA SEMANA. Plan de clase: ../../weeks/week-07.md
 -->
 
-# Knowledge, Reasoning, and Planning
+# Conocimiento, Razonamiento y Planificación
 
-## Part 1 — Propositional logic and SAT
+## Parte 1 — Lógica proposicional y SAT
 
-**CMP-4004** · Week 7
+**CMP-4004** · Semana 7
 
 ![bg right:35%](images/slide01-1.jpeg)
 
 ---
 
-# Why logic?
+# ¿Por qué lógica?
 
 ![bg right:35%](images/slide02-1.jpeg)
 
-## From search to knowledge
+## De la búsqueda al conocimiento
 
-Search agents treat states as **black boxes**: they do not understand the world,
-they only **navigate** through it.
+Los agentes de búsqueda tratan los estados como **cajas negras**: no entienden el mundo,
+solo **navegan** a través de él.
 
-A **logical agent** explicitly *represents* knowledge about the world and
-**reasons** from it.
+Un **agente lógico** *representa* explícitamente conocimiento sobre el mundo y
+**razona** a partir de él.
 
-### The advantage
+### La ventaja
 
-Knowledge is **reusable and generalizable** — one rule applies to infinitely many
-concrete cases.
+El conocimiento es **reutilizable y generalizable** — una sola regla se aplica a infinitos
+casos concretos.
 
-No lookup table has that property. No trained policy states which cases it covers.
+Ninguna tabla de consulta tiene esa propiedad. Ninguna política entrenada indica qué casos cubre.
 
 ---
 
-# The knowledge base
+# La base de conocimiento
 
 ![bg right:35%](images/slide03-1.jpeg)
 
-A set of sentences the agent **knows to be true**, expressed in a formal language.
+Un conjunto de oraciones que el agente **sabe que son verdaderas**, expresadas en un lenguaje formal.
 
-| Operation | Meaning |
+| Operación | Significado |
 |---|---|
-| **TELL** | add new information to the KB |
-| **ASK** | query whether something can be **derived** from the KB |
+| **TELL** | agregar nueva información a la KB |
+| **ASK** | consultar si algo puede **derivarse** de la KB |
 
-The agent runs a cycle: **perceive → TELL → ASK → act**
+El agente ejecuta un ciclo: **percibir → TELL → ASK → actuar**
 
-- **Inference** — the process of deriving new sentences from existing ones
-- **Inference rule** — a mechanism guaranteeing the conclusion is true whenever
-  the premises are
+- **Inferencia** — el proceso de derivar nuevas oraciones a partir de las existentes
+- **Regla de inferencia** — un mecanismo que garantiza que la conclusión es verdadera siempre que
+  las premisas lo sean
 
 <!--
-4 min for the two slides above. The contrast with weeks 3-6 is the payload:
-a search agent NAVIGATES the world, a logical agent DESCRIBES it and derives
-consequences.
+4 min para las dos diapositivas anteriores. El contraste con las semanas 3-6 es el punto clave:
+un agente de búsqueda NAVEGA por el mundo, un agente lógico lo DESCRIBE y deriva
+consecuencias.
 -->
 
 ---
 
-# The vocabulary — get this exactly right
+# El vocabulario — esto debe quedar exactamente claro
 
 ![bg right:28%](images/slide04-1.png)
 
-| Term | Definition |
+| Término | Definición |
 |---|---|
-| **Model** | an assignment of truth values to **all** propositional variables — *"a possible way the world could be"* |
-| **Satisfiable** | true in **at least one** model |
-| **Unsatisfiable** | true in **no** model |
-| **Valid** (tautology) | true in **every** model |
-| **Entailment** `α ⊨ β` | β is true in **every** model in which α is true |
+| **Modelo** | una asignación de valores de verdad a **todas** las variables proposicionales — *"una posible forma en que podría ser el mundo"* |
+| **Satisfacible** | verdadera en **al menos un** modelo |
+| **Insatisfacible** | verdadera en **ningún** modelo |
+| **Válida** (tautología) | verdadera en **todos** los modelos |
+| **Implicación lógica** `α ⊨ β` | β es verdadera en **todo** modelo en el que α es verdadera |
 
-**Correct inference** guarantees that only *logical consequences* of the KB are
-derived.
+La **inferencia correcta** garantiza que solo se deriven *consecuencias lógicas* de la KB.
 
 <!--
-5 min. Students conflate these constantly and Checkpoint 2 tests exactly this
-table. Drill it. Ask for the difference between "valid" and "satisfiable" until
-someone gives it cleanly.
+5 min. Los estudiantes confunden estos conceptos constantemente y el Checkpoint 2 evalúa exactamente
+esta tabla. Reforzarla. Preguntar la diferencia entre "válida" y "satisfacible" hasta
+que alguien la explique correctamente.
 -->
 
 ---
 
-# The central identity
+# La identidad central
 
-# `KB ⊨ α`  iff  `KB ∧ ¬α` is **unsatisfiable**
+# `KB ⊨ α`  sii  `KB ∧ ¬α` es **insatisfacible**
 
-### Why this is the most important equation in the unit
+### Por qué esta es la ecuación más importante de la unidad
 
-| Left side | Right side |
+| Lado izquierdo | Lado derecho |
 |---|---|
-| a claim about **all** models | a **search** for one model |
-| apparently requires surveying everything | a satisfiability check |
-| not directly computable | **this is what a SAT solver does** |
+| una afirmación sobre **todos** los modelos | una **búsqueda** de un modelo |
+| aparentemente requiere revisar todo | una comprobación de satisfacibilidad |
+| no es directamente computable | **esto es lo que hace un solucionador SAT** |
 
-Entailment becomes satisfiability. That conversion is what makes automated
-reasoning possible — **and it is why a SAT solver is a general-purpose reasoning
-engine**, not just a puzzle tool.
+La implicación lógica se convierte en satisfacibilidad. Esa transformación es lo que hace posible
+el razonamiento automatizado — **y por eso un solucionador SAT es un motor de razonamiento
+de propósito general**, no solamente una herramienta para resolver acertijos.
 
 <!--
-6 min. DERIVE IT, do not assert it. If beta is true in every model of alpha, then
-no model makes alpha true and beta false, so alpha AND NOT-beta has no model.
-Run both directions.
+6 min. DERIVARLO, no solo afirmarlo. Si beta es verdadera en todo modelo de alpha, entonces
+no existe ningún modelo donde alpha sea verdadera y beta falsa, por lo que alpha AND NOT-beta
+no tiene ningún modelo.
+Mostrar ambas direcciones.
 -->
 
 ---
 
-# Propositional logic
+# Lógica proposicional
 
 ![bg right:35%](images/slide05-1.png)
 
-- A **proposition** is a statement that can be true or false
-- **Propositional symbols** represent facts about the world
-- **Complex sentences** are built with logical connectives
+- Una **proposición** es una afirmación que puede ser verdadera o falsa
+- Los **símbolos proposicionales** representan hechos sobre el mundo
+- Las **oraciones complejas** se construyen utilizando conectores lógicos
 
 `¬` `∧` `∨` `→` `↔`
 
-That is the entire language. Its limits are the reason week 8 exists.
+Ese es todo el lenguaje. Sus limitaciones son la razón por la que existe la semana 8.
 
 ---
 
-# Semantics and truth tables
+# Semántica y tablas de verdad
 
 ![bg right:35%](images/slide06-1.png)
 
-**Semantics** defines when a sentence is true in a given **model**.
-**Truth tables** enumerate all possible models.
+La **semántica** define cuándo una oración es verdadera en un **modelo** determinado.
+Las **tablas de verdad** enumeran todos los modelos posibles.
 
-## The row everyone resists: `P → Q`
+## La fila que todos se resisten a aceptar: `P → Q`
 
 | P | Q | P → Q |
 |---|---|---|
-| T | T | **T** |
-| T | F | **F** |
-| F | T | **T** |
-| F | F | **T** |
+| V | V | **V** |
+| V | F | **F** |
+| F | V | **V** |
+| F | F | **V** |
 
-It is false **only** when P is true and Q is false. If P is false, the implication
-is true **regardless of Q**.
+Es falsa **únicamente** cuando P es verdadera y Q es falsa. Si P es falsa, la implicación
+es verdadera **sin importar Q**.
 
-*"If the moon is cheese, I am the king of Spain"* — true.
+*"Si la Luna es de queso, yo soy el rey de España"* — verdadera.
 
 <!--
-Give the vacuous-truth example and MOVE ON QUICKLY. Arguing about material
-implication burns five minutes and convinces nobody. It is a definition.
+Dar el ejemplo de verdad vacua y SEGUIR RÁPIDO. Discutir sobre la implicación material
+consume cinco minutos y no convence a nadie. Es una definición.
 -->
 
 ---
 
-# Inference rules
+# Reglas de inferencia
 
 ![bg right:30%](images/slide08-1.png)
 
-| Rule | Form |
+| Regla | Forma |
 |---|---|
 | **Modus ponens** | `α → β`, `α`  ⟹  `β` |
 | **Modus tollens** | `α → β`, `¬β`  ⟹  `¬α` |
-| **And-elimination** | `α ∧ β`  ⟹  `α` |
-| **Resolution** | `α ∨ β`, `¬β ∨ γ`  ⟹  `α ∨ γ` |
+| **Eliminación de la conjunción** | `α ∧ β`  ⟹  `α` |
+| **Resolución** | `α ∨ β`, `¬β ∨ γ`  ⟹  `α ∨ γ` |
 
-Each **preserves truth**: if the premises hold in a model, so does the conclusion.
+Cada una **preserva la verdad**: si las premisas se cumplen en un modelo, también lo hace la conclusión.
 
-### And the one that is *not* a rule
+### Y la que *no* es una regla
 
-`α → β`, `β` ⟹ `α` — **affirming the consequent.** This is the warm-up poll, and
-it is invalid.
+`α → β`, `β` ⟹ `α` — **afirmación del consecuente.** Esta es la encuesta de calentamiento,
+y es inválida.
 
 <!--
-5 min. Model checking by truth-table enumeration is sound and complete but
-O(2^n) — name that cost, because DPLL in the live-coding block is the response
-to it.
+5 min. La comprobación de modelos mediante enumeración de tablas de verdad es correcta y completa, pero
+O(2^n) — mencionar ese costo, porque DPLL en el bloque de programación en vivo es la respuesta
+a ese problema.
 -->
 
 ---
 
-# A note on the source deck: semantic networks
+# Una nota sobre la presentación fuente: redes semánticas
 
 ![bg right:38%](images/slide07-1.png)
 
@@ -193,67 +193,68 @@ hassize(bluebird, small)   hascovering(bird, feathers)
 hascolor(bluebird, blue)   hasproperty(bird, flies)
 ```
 
-Notice what it wants to say and cannot say here:
+Observa lo que quiere expresar y no puede expresar aquí:
 
-> *Everything that is a bird has feathers.*
+> *Todo lo que es un ave tiene plumas.*
 
-Propositional logic cannot express that. You would need one sentence per bird.
+La lógica proposicional no puede expresar eso. Necesitarías una oración por cada ave.
 
-**We come back to this exact KB in week 8** and write the inheritance rule in one
-line of Prolog.
+**Volvemos exactamente a esta KB en la semana 8** y escribiremos la regla de herencia
+en una sola línea de Prolog.
 
 ---
 
-# Limitations of propositional logic
+# Limitaciones de la lógica proposicional
 
 ![bg right:32%](images/slide09-1.jpeg)
 
-Propositional logic is **decidable** and has clear semantics. It is also **not
-very expressive.** It cannot represent:
+La lógica proposicional es **decidible** y tiene una semántica clara. También es **poco
+expresiva.** No puede representar:
 
-- **Objects and their properties** — no way to say "all pits cause a breeze"
-  without enumerating every case
-- **Relations between objects** — "John is Mary's father" needs a distinct
-  proposition for every pair
-- **Quantifiers** — "every animal has a heart" is inexpressible
+- **Objetos y sus propiedades** — no existe una forma de decir "todos los pozos causan una brisa"
+  sin enumerar cada caso
+- **Relaciones entre objetos** — "John es el padre de Mary" necesita una proposición diferente
+  para cada par
+- **Cuantificadores** — "todo animal tiene un corazón" no puede expresarse
 
-With *n* objects and *k*-ary relations you need **O(nᵏ)** propositions.
-**It does not scale.**
+Con *n* objetos y relaciones de aridad *k* necesitas **O(nᵏ)** proposiciones.
+**No escala.**
 
-**Solution: First-Order Logic** — objects, relations, and quantifiers. *(Week 8.)*
+**Solución: Lógica de Primer Orden** — objetos, relaciones y cuantificadores. *(Semana 8.)*
 
 <!--
-5 min. Make it concrete with the Wumpus World: a 4x4 grid needs dozens of
-propositions to say what FOL says in one line. The studio task has students feel
-this by hand, so plant it here.
+5 min. Hacerlo concreto con Wumpus World: una cuadrícula 4x4 necesita docenas de
+proposiciones para decir lo que FOL expresa en una sola línea. La tarea del estudio hace que los estudiantes
+experimenten esto manualmente, así que introducir la idea aquí.
 -->
 
 ---
 
-# Next: live coding — DPLL (1962)
+# Siguiente: programación en vivo — DPLL (1962)
 
-Backtracking search over assignments, with **unit propagation**:
+Búsqueda por backtracking sobre asignaciones, con **propagación unitaria**:
 
-- a clause with one unassigned literal leaves **no choice** → assign it
-- this is week 6's **forward checking**, specialized to Boolean domains
+- una cláusula con un literal no asignado deja **sin elección** → asígnalo
+- esto es el **forward checking** de la semana 6, especializado en dominios booleanos
 
-Structurally the same as your CSP solver. Notice that.
+Estructuralmente es lo mismo que tu solucionador CSP. Observa eso.
 
-## And the identity, in code
+## Y la identidad, en código
 
 ```python
 def entails(kb_clauses, alpha_clauses):
-    """KB ⊨ α  iff  KB ∧ ¬α is unsatisfiable."""
+    """KB ⊨ α  sii  KB ∧ ¬α es insatisfacible."""
     return dpll(kb_clauses + negate_cnf(alpha_clauses)) is None
 ```
 
-**Studio:** a Wumpus World agent that moves only to squares it can **prove** safe
-— then the same percepts given to an LLM, scored on **soundness**, not accuracy.
+**Studio:** un agente de Wumpus World que se mueve únicamente a casillas que puede **demostrar**
+que son seguras — luego, las mismas percepciones se entregan a un LLM, evaluado según **corrección lógica**,
+no precisión.
 
 <!--
-On the Wumpus KB, the counter shows most variables get assigned by propagation
-with almost no branching. Same lesson as week 6: INFERENCE BEATS SEARCH.
-The honest boundary to flag in the studio: logic tells you what follows, not what
-to do when nothing follows. That is the motivation for week 12.
-CHECKPOINT 1 THIS WEEK — covers weeks 1-6.
+En la KB de Wumpus, el contador muestra que la mayoría de las variables se asignan mediante propagación
+con casi ninguna ramificación. La misma lección que en la semana 6: LA INFERENCIA SUPERA A LA BÚSQUEDA.
+El límite importante que debe señalarse en el estudio: la lógica te dice qué se deriva, no qué
+hacer cuando no se deriva nada. Esa es la motivación para la semana 12.
+CHECKPOINT 1 ESTA SEMANA — cubre las semanas 1-6.
 -->

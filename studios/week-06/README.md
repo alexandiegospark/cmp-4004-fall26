@@ -1,158 +1,157 @@
-# Week 6 Studio — Inference Beats Search, and the Solver Owns the Guarantee
+# Semana 6 Studio — La inferencia supera a la búsqueda, y el solucionador posee la garantía
 
-**Companion to** [`../../weeks/week-06.md`](../../weeks/week-06.md) — Session 6B.
-**Time budget:** Recap 5 · Breakouts 45 · Demos 20 · Debrief 10 (80 min total).
-**Deliverables:** all provided tests pass, a Task-1 ablation table for your own
-schedule, and the three-arm scorecard (A / B / C) with arm B's failure taxonomy.
+**Complemento de** [`../../weeks/week-06.md`](../../weeks/week-06.md) — Sesión 6B.
+**Tiempo estimado:** Repaso 5 · Trabajo en grupos 45 · Demos 20 · Cierre 10 (80 min en total).
+**Entregables:** todas las pruebas proporcionadas deben pasar, una tabla de ablación de la Tarea 1 para tu propio
+horario, y la tabla comparativa de los tres enfoques (A / B / C) con la taxonomía de fallos del enfoque B.
 
-> **Recap (5 min).** *Which gave the bigger win — forward checking or MRV? Why?*
-> Cold-call. If nobody has it: on the notebook's HARD Sudoku, forward checking
-> **times out** and MRV is the difference between *solved* and *never finishes*.
-> Variable ordering wants to **fail fast**; value ordering wants to **succeed first**.
+> **Repaso (5 min).** *¿Qué produjo una mayor mejora — forward checking o MRV? ¿Por qué?*
+> Pregunta directa. Si nadie responde: en el Sudoku HARD del notebook, forward checking
+> **alcanza el timeout** y MRV marca la diferencia entre *resuelto* y *nunca termina*.
+> El ordenamiento de variables busca **fallar rápido**; el ordenamiento de valores busca **tener éxito primero**.
 
-> **Duel 1 (Search) was collected at Session 6A.** If your pair has not handed it
-> in, do that first — spec at [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md).
+> **El Duelo 1 (Búsqueda) fue entregado en la Sesión 6A.** Si tu pareja todavía no lo ha entregado,
+> hagan eso primero — especificación en [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md).
 
-## Files in this folder
+## Archivos en esta carpeta
 
-| File | Purpose | You edit it? |
+| Archivo | Propósito | ¿Lo editas? |
 |---|---|---|
-| [`csp.py`](csp.py) | Given: the `CSP`, `backtrack_search` (fc / mrv / lcv / ac3 switches), `ac3`, and the Sudoku (`EASY`/`MED`/`HARD`) + Australia map fixtures — unchanged from the notebook | ❌ |
-| [`logic_lm.py`](logic_lm.py) | Given: the arm-B plumbing — `MODEL_PROMPT`, `parse_json`, `build_csp` (alldiff / neq / eq), `classify_arm_b`, worked-example puzzles, and `load_puzzles()` | ❌ (use it) |
-| [`puzzles.json`](puzzles.json) | Given: the bank of **20** verified NL logic puzzles (NL statement + CSP spec + unique gold). 5 marked `worked_example` | ❌ (use it) |
-| [`_verify_puzzles.py`](_verify_puzzles.py) | Given: the soundness check — every puzzle builds via `build_csp`, has a **unique** solution matching its gold, and re-solves under `backtrack_search` | ❌ (run it) |
-| [`starter.py`](starter.py) | **Tasks 1–2** — model the schedule CSP, write the arm-B refinement loop | ✅ |
-| [`test_csp.py`](test_csp.py) | Provided tests, incl. `test_lcv_can_hurt` and `test_plain_backtracking_blows_up` | ❌ |
+| [`csp.py`](csp.py) | Proporcionado: `CSP`, `backtrack_search` (interruptores fc / mrv / lcv / ac3), `ac3`, y los Sudokus (`EASY`/`MED`/`HARD`) + instancias del mapa de Australia — sin cambios respecto al notebook | ❌ |
+| [`logic_lm.py`](logic_lm.py) | Proporcionado: la infraestructura del enfoque B — `MODEL_PROMPT`, `parse_json`, `build_csp` (alldiff / neq / eq), `classify_arm_b`, problemas de ejemplo resueltos y `load_puzzles()` | ❌ (úsalo) |
+| [`puzzles.json`](puzzles.json) | Proporcionado: banco de **20** problemas lógicos verificados en lenguaje natural (enunciado NL + especificación CSP + respuesta gold única). 5 están marcados como `worked_example` | ❌ (úsalo) |
+| [`_verify_puzzles.py`](_verify_puzzles.py) | Proporcionado: verificación de corrección — cada problema se construye mediante `build_csp`, tiene una solución **única** que coincide con su gold y vuelve a resolverse con `backtrack_search` | ❌ (ejecútalo) |
+| [`starter.py`](starter.py) | **Tareas 1–2** — modelar el CSP del horario y escribir el ciclo de refinamiento del enfoque B | ✅ |
+| [`test_csp.py`](test_csp.py) | Pruebas proporcionadas, incluidas `test_lcv_can_hurt` y `test_plain_backtracking_blows_up` | ❌ |
 
-The CSP engine has no `instances.json`: the notebook's search instances are fixed
-strings (`HARD`/`EASY`/`MED`) and the Australia map, so they live inline in `csp.py`
-exactly as the notebook defines them — nothing is randomly generated. The Logic-LM
-puzzle bank, by contrast, ships as [`puzzles.json`](puzzles.json): 20 hand-written
-puzzles, each with a solver-verified unique answer (run `python3 _verify_puzzles.py`
-— it prints `ALL 20 PUZZLES SOUND`). Because `build_csp` supports only `alldiff`,
-`neq`, and `eq`, every puzzle is a small (3–5 entity) assignment problem in exactly
-that vocabulary.
+El motor CSP no tiene un archivo `instances.json`: las instancias de búsqueda del notebook son cadenas fijas
+(`HARD`/`EASY`/`MED`) y el mapa de Australia, por lo que se encuentran directamente en `csp.py`
+exactamente como las define el notebook — no se genera nada aleatoriamente. El banco de problemas
+de Logic-LM, en cambio, se distribuye como [`puzzles.json`](puzzles.json): 20 problemas escritos manualmente,
+cada uno con una respuesta única verificada por el solucionador (ejecuta `python3 _verify_puzzles.py`
+— imprime `ALL 20 PUZZLES SOUND`). Como `build_csp` solo admite `alldiff`,
+`neq` y `eq`, cada problema es un pequeño problema de asignación (de 3 a 5 entidades) exactamente
+con ese vocabulario.
 
-## Task 1 — Solve a scheduling CSP (15 min)
+## Tarea 1 — Resolver un CSP de horarios (15 min)
 
-Open `starter.py` and fill in `scheduling_csp()`. Model the school-schedule problem
-from the deck: assign each activity a **distinct period**, and honour the one hard
-rule — **sports cannot be scheduled after lunch**.
+Abre `starter.py` y completa `scheduling_csp()`. Modela el problema del horario escolar
+de la presentación: asigna a cada actividad un **periodo distinto** y respeta la única regla estricta
+— **los deportes no pueden programarse después del almuerzo**.
 
-Both parts map straight onto the notebook's `CSP` class:
+Ambas partes se traducen directamente a la clase `CSP` del notebook:
 
-- *All-different* → make every activity a **neighbour** of every other activity
-  (a complete graph). The engine's `consistent` check is already all-different, so
-  the complete graph is the whole encoding.
-- *No sports after lunch* → pre-restrict `Sports`'s **domain** to the morning
-  periods (`1..LUNCH_AFTER`). Every other activity may take any period.
+- *All-different* → convierte cada actividad en **vecina** de todas las demás actividades
+  (un grafo completo). La comprobación `consistent` del motor ya implementa all-different, por lo que
+  el grafo completo constituye toda la codificación.
+- *No deportes después del almuerzo* → restringe previamente el **dominio** de `Sports` a los periodos
+  de la mañana (`1..LUNCH_AFTER`). Todas las demás actividades pueden tomar cualquier periodo.
 
-Then run:
+Luego ejecuta:
 
 ```bash
 python3 test_csp.py
 ```
 
-`test_scheduling_is_valid_timetable` and `test_scheduling_sports_before_lunch`
-check that your model produces a complete, all-different timetable with sports in
-the morning. Report the ablation for **your** instance with `run_ablation` — same
-four configurations as the notebook, on your schedule.
+`test_scheduling_is_valid_timetable` y `test_scheduling_sports_before_lunch`
+comprueban que tu modelo produce un horario completo, con todos los periodos distintos y con deportes
+en la mañana. Reporta la ablación para **tu propia** instancia utilizando `run_ablation` — las mismas
+cuatro configuraciones del notebook, aplicadas a tu horario.
 
-The other three tests need no code from you — they are the point of the week, run
-against the notebook's HARD Sudoku:
+Las otras tres pruebas no requieren código adicional de tu parte — representan el punto principal
+de la semana y se ejecutan sobre el Sudoku HARD del notebook:
 
-- `test_ac3_prunes_hard_sudoku` — AC-3 shrinks the domains *before any guess*.
-- `test_plain_backtracking_blows_up` — plain backtracking is **complete**, so it
-  "should" solve any solvable puzzle. On HARD it exhausts a 300 000-call budget
-  and never finishes, while fc + MRV + AC-3 solves in ~34 000. "Complete" says
-  nothing about *when*.
-- `test_lcv_can_hurt` — LCV is *least constraining value*; it is supposed to help.
-  On HARD it makes search **strictly worse** (34,478 → 56,813 backtrack calls).
-  A test that asserts a heuristic *fails* is not a bug — value ordering is a gamble
-  you pay for on every branch, and you report what you measure, not what the
-  textbook implies.
+- `test_ac3_prunes_hard_sudoku` — AC-3 reduce los dominios *antes de realizar cualquier suposición*.
+- `test_plain_backtracking_blows_up` — el backtracking simple es **completo**, por lo que
+  "debería" resolver cualquier problema que tenga solución. En HARD agota un presupuesto
+  de 300 000 llamadas y nunca termina, mientras que fc + MRV + AC-3 lo resuelve en ~34 000.
+  "Completo" no dice nada sobre *cuándo* terminará.
+- `test_lcv_can_hurt` — LCV significa *least constraining value*; se supone que debe ayudar.
+  En HARD hace que la búsqueda sea **estrictamente peor** (34,478 → 56,813 llamadas de backtracking).
+  Una prueba que afirma que una heurística *falla* no es un error — el ordenamiento de valores es una apuesta
+  cuyo costo pagas en cada rama, y debes reportar lo que realmente mides, no lo que el libro de texto sugiere.
 
-## Task 2 — The three-arm experiment (25 min)
+## Tarea 2 — El experimento de tres enfoques (25 min)
 
-This is the course's central experiment; it recurs in weeks 8, 9 and the capstone.
-Same puzzles, three pipelines:
+Este es el experimento central del curso; vuelve a aparecer en las semanas 8, 9 y en el proyecto final.
+Mismos problemas, tres pipelines:
 
-| Arm | Pipeline |
+| Enfoque | Pipeline |
 |---|---|
-| **A — Hand-modeled** | you write the CSP by hand → your solver |
-| **B — Hybrid (Logic-LM)** | the LLM writes the CSP → your solver |
-| **C — End-to-end LLM** | the LLM reads the puzzle and answers directly |
+| **A — Modelado manual** | tú escribes el CSP a mano → tu solucionador |
+| **B — Híbrido (Logic-LM)** | el LLM escribe el CSP → tu solucionador |
+| **C — LLM de extremo a extremo** | el LLM lee el problema y responde directamente |
 
-Arm B is the engineering. The plumbing is provided in `logic_lm.py` — the exact
-`MODEL_PROMPT` from the plan, a forgiving `parse_json`, `build_csp` (which turns the
-JSON spec into a CSP your *same* `backtrack_search` solves), and `classify_arm_b`,
-which labels every reply into the plan's four buckets:
+El enfoque B contiene la parte de ingeniería. La infraestructura ya está proporcionada en `logic_lm.py` —
+el `MODEL_PROMPT` exacto del plan, un `parse_json` tolerante, `build_csp` (que transforma la
+especificación JSON en un CSP que resuelve tu *mismo* `backtrack_search`) y `classify_arm_b`,
+que clasifica cada respuesta en las cuatro categorías del plan:
 
-1. **`malformed_json`** — the reply did not parse (or the spec is structurally broken)
-2. **`valid_json_wrong_model`** — the solver returns a solution, but the wrong one
-3. **`valid_no_solution`** — over-constrained: a translation error the solver rejects
-4. **`timeout`** — the solver hit its call limit
+1. **`malformed_json`** — la respuesta no pudo parsearse (o la especificación está estructuralmente dañada)
+2. **`valid_json_wrong_model`** — el solucionador devuelve una solución, pero es la solución incorrecta
+3. **`valid_no_solution`** — sobre-restringido: un error de traducción que el solucionador rechaza
+4. **`timeout`** — el solucionador alcanzó su límite de llamadas
 
-What **you** write in `starter.py`: `solve_arm_b_with_refinement()` — the prompt
-wiring around your local model **and the self-refinement loop**. When the solver
-reports no solution or the JSON fails to parse, feed the error back and retry (max
-3). Report solve rate **with and without** refinement — that delta is Logic-LM's
-actual contribution and it is usually large.
+Lo que **tú** escribes en `starter.py`: `solve_arm_b_with_refinement()` — la conexión del prompt
+con tu modelo local **y el ciclo de auto-refinamiento**. Cuando el solucionador indique que no hay solución
+o el JSON no pueda parsearse, devuelve el error al modelo y vuelve a intentarlo (máximo 3 intentos).
+Reporta la tasa de resolución **con y sin** refinamiento — esa diferencia representa la contribución
+real de Logic-LM y normalmente es grande.
 
 ```python
-from aicourse.llm import LLM        # or your own local client
+from aicourse.llm import LLM        # o tu propio cliente local
 from logic_lm import load_puzzles, worked_examples
 from starter import solve_arm_b_with_refinement
 
 model = LLM()
-for ex in worked_examples():        # the 5 fully-worked starters, each with a `gold`
+for ex in worked_examples():        # los 5 ejemplos completamente resueltos, cada uno con un `gold`
     cat, sol, tries = solve_arm_b_with_refinement(model, ex["puzzle"], gold=ex["gold"])
-    print(ex["id"], ex["puzzle"][:40], "->", cat, f"({tries} attempts)")
+    print(ex["id"], ex["puzzle"][:40], "->", cat, f"({tries} intentos)")
 
-# then the full run over all 20:
+# luego ejecuta sobre los 20 problemas:
 for p in load_puzzles():
     cat, sol, tries = solve_arm_b_with_refinement(model, p["puzzle"], gold=p["gold"])
 ```
 
-The full run uses the **20** natural-language logic puzzles in
-[`puzzles.json`](puzzles.json), loaded with `load_puzzles()`. **Five are marked
-`worked_example`** (`worked_examples()`) — the three that were always inline in
-`logic_lm.py` (`p01`–`p03`) plus two more (`p04`–`p05`) — fully-worked so you can
-inspect the NL → spec → gold mapping and use them as few-shot fuel; run the arms
-over the other 15 and report how many you solved on the scorecard. Every puzzle's
-gold is solver-verified unique (`_verify_puzzles.py`), so arm A / arm C answers can
-be graded against it unambiguously. Small local models struggle to emit valid JSON;
-that is realistic — tighten the prompt or use constrained decoding rather than
-reaching for a bigger model.
+La ejecución completa utiliza los **20** problemas lógicos en lenguaje natural de
+[`puzzles.json`](puzzles.json), cargados mediante `load_puzzles()`. **Cinco están marcados
+como `worked_example`** (`worked_examples()`) — los tres que siempre estuvieron directamente en
+`logic_lm.py` (`p01`–`p03`) más otros dos (`p04`–`p05`) — completamente resueltos para que puedas
+inspeccionar la transformación NL → especificación → gold y utilizarlos como ejemplos few-shot;
+ejecuta los enfoques sobre los otros 15 y reporta cuántos resolviste en la tabla comparativa.
+La respuesta gold de cada problema es única y ha sido verificada por el solucionador (`_verify_puzzles.py`),
+por lo que las respuestas de los enfoques A / C pueden evaluarse contra ella sin ambigüedad.
+Los modelos locales pequeños tienen dificultades para producir JSON válido; eso es realista —
+mejora el prompt o utiliza decodificación restringida en lugar de recurrir a un modelo más grande.
 
-**Task 3 — Scorecard (5 min).** Three columns this time: A, B, C. Solve rate per
-arm, plus arm B's failure taxonomy.
+**Tarea 3 — Tabla comparativa (5 min).** Esta vez utiliza tres columnas: A, B, C.
+Reporta la tasa de resolución de cada enfoque, además de la taxonomía de fallos del enfoque B.
 
 ## Demos (20 min)
 
-Ask for arm B failure taxonomies specifically. The most valuable class discovery:
-**arm B's failures are visible and arm C's are not.** When the LLM writes a bad
-CSP, the solver frequently *tells you* (no solution, or a parse error). When the
-LLM answers directly and is wrong, nothing signals it. Get a student to say it out
-loud; if nobody does, ask: *"which arm would you rather deploy, and how would you
-know it broke?"*
+Pregunta específicamente por las taxonomías de fallos del enfoque B. El descubrimiento más importante
+de la clase: **los fallos del enfoque B son visibles y los del enfoque C no lo son.**
+Cuando el LLM escribe un CSP incorrecto, el solucionador frecuentemente *te lo dice*
+(no hay solución, o existe un error de parseo). Cuando el LLM responde directamente y está equivocado,
+no hay ninguna señal que lo indique. Haz que un estudiante lo diga explícitamente; si nadie lo hace,
+pregunta: *"¿qué enfoque preferirían desplegar y cómo sabrían que falló?"*
 
-## Debrief (10 min)
+## Cierre (10 min)
 
-- Arm A is best on correctness, worst on human effort per puzzle.
-- Arm C is easiest and least reliable — with **silent** failures.
-- Arm B is usually close to A on correctness while handling messy natural language,
-  and its errors are **loud**. That combination is why the pattern matters.
-- **The guarantee lives in the solver.** Once the model is faithful, correctness is
-  *provable* (recall the map-colouring proof of non-existence in `csp.py` — a
-  categorical capability with no LLM analogue). The remaining risk concentrates in
-  translation, which is where you aim your verification effort.
-- Preview: weeks 7–9 apply this pattern to logic and planning, with progressively
-  more powerful solvers.
+- El enfoque A es el mejor en términos de corrección, pero el peor en esfuerzo humano por problema.
+- El enfoque C es el más sencillo y el menos confiable — con fallos **silenciosos**.
+- El enfoque B normalmente se acerca al enfoque A en corrección mientras puede manejar lenguaje natural
+  desordenado, y sus errores son **visibles**. Esa combinación es la razón por la que este patrón importa.
+- **La garantía está en el solucionador.** Una vez que el modelo formal representa fielmente el problema,
+  la corrección puede *demostrarse* (recuerda la prueba de inexistencia en el problema de coloreo de mapas
+  dentro de `csp.py` — una capacidad categórica que no tiene equivalente directo en un LLM).
+  El riesgo restante se concentra en la traducción, que es donde debes enfocar tus esfuerzos de verificación.
+- Adelanto: las semanas 7–9 aplicarán este patrón a lógica y planificación, utilizando solucionadores
+  progresivamente más potentes.
 
-## Links
+## Enlaces
 
-- Session 6A notebook — [`../../notebooks/week-06-csp.ipynb`](../../notebooks/week-06-csp.ipynb)
-- Duel 1 spec (collected this week) — [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md)
-- Duel scorecard — [`../../resources/duel-scorecard.md`](../../resources/duel-scorecard.md)
-- AI policy (`AI_LOG.md`) — [`../../resources/ai-policy.md`](../../resources/ai-policy.md)
+- Notebook de la Sesión 6A — [`../../notebooks/week-06-csp.ipynb`](../../notebooks/week-06-csp.ipynb)
+- Especificación del Duelo 1 (entregado esta semana) — [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md)
+- Tabla comparativa del Duelo — [`../../resources/duel-scorecard.md`](../../resources/duel-scorecard.md)
+- Política de IA (`AI_LOG.md`) — [`../../resources/ai-policy.md`](../../resources/ai-policy.md)
