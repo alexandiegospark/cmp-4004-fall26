@@ -1,93 +1,103 @@
-"""Week 1 studio — Task 1 starter (extend ELIZA, then meet the local model).
+"""Taller de la semana 1 — Plantilla de la tarea 1: amplía ELIZA y compara con el modelo local.
 
-Fill in the three TODOs below. Then run ``python3 test_eliza.py``. The provided
-tests must pass — INCLUDING ``test_declared_failure_is_hollow``, which watches a
-guarantee fail: ELIZA drops the second half of a compound sentence because
-first-match-wins means it has no model of the rest of the input. A test that
-insists your ELIZA break in a specific way is not a mistake; being able to
-*predict the failure* is the whole point of week 1.
+Completa los tres TODOs y ejecuta ``python3 test_eliza.py``. Todas las pruebas deben
+pasar, INCLUIDA ``test_declared_failure_is_hollow``, que observa cómo falla una
+garantía: ELIZA omite la segunda parte de una oración compuesta porque la primera
+coincidencia gana y no tiene un modelo del resto de la entrada. Una prueba que
+exige este fallo específico es deliberada: *predecir el fallo* es el objetivo de la semana 1.
 
-Task 2 (first contact) lives at the bottom as a sketch — you run it in your own
-script and write ``first_contact.md``. Prompts are in ``prompts.json``.
+Al final aparece el esquema de la tarea 2 (primer contacto). Ejecútalo en tu propio
+script y escribe ``first_contact.md``. Los prompts están en ``prompts.json``.
 """
+# Se organiza mediante funciones y datos compartidos; no hay clases propias.
+# Importar RULES y reflect reutiliza otro módulo
 import re
 
 from eliza import RULES, FALLBACK, REFLECT, reflect, respond
 
 
-# ---- Task 1a — add THREE new rules ------------------------------------------
+# ---- Tarea 1a: añade TRES reglas nuevas -------------------------------------
 def new_rules():
-    """Return a list of >= 3 NEW ``(pattern, [templates])`` rules you invented.
+    """Devuelve una lista con al menos 3 reglas NUEVAS ``(pattern, [templates])``.
 
-    Same shape as ``eliza.RULES``: a regex string, and a list of response
-    templates whose ``{0}``, ``{1}`` ... slots are filled by the *reflected*
-    regex groups (see ``eliza.respond``). Rules:
+    Usa la estructura de ``eliza.RULES``: una cadena de expresión regular y una
+    lista de plantillas cuyos campos ``{0}``, ``{1}``, etc. se completan con los
+    grupos capturados después de sustituir los pronombres (véase ``eliza.respond``).
 
-    - must be at least 3,
-    - must not duplicate a pattern already in ``eliza.RULES``,
-    - must each actually trigger on *some* input (no pattern that matches the
-      empty string — that would just shadow the fallback for everything).
+    Las reglas deben:
+    - ser al menos 3;
+    - no duplicar ningún patrón de ``eliza.RULES``;
+    - activarse ante alguna entrada real y nunca ante la cadena vacía, porque
+      eso impediría usar las respuestas por defecto.
 
-    Example (delete it and write your own):
-        (r"\\bI want (.*)", ["What would it mean to you to get {0}?"])
+    Ejemplo (elimínalo y escribe el tuyo):
+        (r"\bI want (.*)", ["What would it mean to you to get {0}?"])
     """
-    # TODO: return a list of >= 3 (pattern, [templates]) tuples.
+    # list almacena varias reglas; cada tuple agrupa un patrón y sus plantillas.
+    # TODO: devuelve una lista con al menos 3 tuplas (pattern, [templates]).
     raise NotImplementedError
 
 
-# ---- Task 1b — the extended responder ---------------------------------------
+# ---- Tarea 1b: función de respuesta ampliada --------------------------------
 def extended_respond(text):
-    """Respond using ``eliza.RULES`` FIRST, then ``new_rules()``, then FALLBACK.
+    """Responde con ``eliza.RULES`` PRIMERO, después ``new_rules()`` y luego FALLBACK.
 
-    Base rules keep priority (so nothing you add breaks the demo). Reuse
-    ``eliza.reflect`` for the pronoun swap — do not reinvent it. The shortest
-    correct body is ``eliza.respond``'s loop run over ``RULES + new_rules()``.
+    Las reglas base conservan la prioridad para que las nuevas no alteren la
+    demostración. Reutiliza ``eliza.reflect`` para sustituir los pronombres.
+    La implementación más breve es el bucle de ``eliza.respond`` aplicado a
+    ``RULES + new_rules()``.
     """
-    # TODO: loop over RULES + new_rules(); on first regex match, reflect the
-    #       groups and format a random template; else fall back.
+    # El orden de la lista determina qué regla gana; return detiene el recorrido.
+    # Un objeto Match ofrece groups(); las cadenas ofrecen format(*groups).
+    # TODO: recorre RULES + new_rules(); en la primera coincidencia, sustituye
+    #       los pronombres de los grupos y completa una plantilla aleatoria; si no, usa FALLBACK.
     raise NotImplementedError
 
 
-# ---- Task 1c — declare your deliberate failure ------------------------------
+# ---- Tarea 1c: declara tu fallo deliberado ----------------------------------
 def failure_case():
-    """Return ``(input_text, why_it_fails)``.
+    """Devuelve ``(input_text, why_it_fails)``.
 
-    Pick an input your extended ELIZA answers *fluently but hollowly* — an
-    ELIZA-class failure (fluent, on-topic, empty). To satisfy the provided
-    failure test, use a COMPOUND sentence of the form
-    ``"<clause A> and <clause B>"`` where ELIZA reacts to clause A and silently
-    drops clause B entirely (first-match-wins). The notebook's canonical case
-    is "My mother is a doctor and my father is a lawyer".
+    Elige una entrada para la que tu ELIZA ampliada responda con fluidez, pero
+    sin comprensión: una respuesta pertinente y vacía, característica de ELIZA.
+    La prueba exige una oración COMPUESTA ``"<cláusula A> and <cláusula B>"``:
+    ELIZA reacciona a la cláusula A y omite por completo la B porque gana la primera
+    coincidencia. El ejemplo del notebook es
+    "My mother is a doctor and my father is a lawyer".
 
-    The second element is a one-sentence explanation of the failure. Paste it
-    into your ``eliza.py`` docstring for the commit the plan asks for
-    (``week01/eliza.py`` with the failure documented).
+    El segundo elemento explica el fallo en una oración. Pégalo en la cadena de
+    documentación de ``eliza.py`` para el commit solicitado por el plan:
+    ``week01/eliza.py``, con el fallo documentado.
     """
-    # TODO: return (input_text, why_it_fails)
+    # Son dos valores en una tupla: dato de prueba y explicación legible del fallo.
+    # TODO: devuelve (input_text, why_it_fails)
     raise NotImplementedError
 
 
-# ---- Task 2 sketch — first contact (see README §"Task 2") -------------------
-# Send the SAME prompts to ELIZA and to the local model, record BOTH transcripts
-# in first_contact.md, then answer the three questions in the README.
+# ---- Esquema de la tarea 2: primer contacto (véase README, «Tarea 2») ---------
+# Envía los MISMOS prompts a ELIZA y al modelo local; registra AMBAS transcripciones
+# en first_contact.md y responde las tres preguntas del README.
 #
 #     import json
 #     from aicourse.llm import LLM
 #     from starter import extended_respond
 #
 #     prompts = json.load(open("prompts.json"))["first_contact"]
-#     llm = LLM(backend="ollama")          # or run with --backend manual
+#     # POO: LLM es una clase; llm es una instancia configurada con un backend.
+#     # llm.complete(p) invoca su método; .text accede al atributo del resultado.
+#     llm = LLM(backend="ollama")          # o ejecuta con --backend manual
 #     for p in prompts:
 #         print("you  >", p)
 #         print("ELIZA>", extended_respond(p))
 #         print("LLM  >", llm.complete(p).text, "\n")
 #
-# Do NOT ask the model to grade itself ("does that answer look right?"). You are
-# the checker. That anti-pattern is scorecard axis 3.
+# NO pidas al modelo que se evalúe a sí mismo («¿parece correcta esa respuesta?»). Tú eres
+# quien verifica. Esa mala práctica corresponde al eje 3 de la ficha de evaluación.
 
 
+# Al importar starter no se ejecuta esta demostración.
 if __name__ == "__main__":
-    # Smoke test: exercise whatever you have filled in on one input.
+    # Prueba básica: ejecuta lo que hayas completado con una entrada.
     probe = "I am not feeling great about the exam"
     print("base   >", respond(probe))
     try:

@@ -2,123 +2,123 @@
 marp: true
 theme: default
 paginate: true
-header: 'CMP-4004 · Week 0 · Getting Ready'
+header: 'CMP-4004 · Semana 0 · Preparación'
 ---
 
 <!--
 ==============================================================================
-WEEK 0 — SELF-PACED. THIS DECK IS FOR STUDENTS TO READ ALONE.
-Unlike decks 01-14 this is NOT a mini-lecture script. There is no live session
-behind it: week 1 session A is syllabus + intros, and session B is asynchronous
-(instructor travelling). So this deck is written in the second person, to be
-read without a narrator, and it hands off to the notebook for the actual work.
-Share it as PDF or HTML before the term starts.
+SEMANA 0 — A TU PROPIO RITMO. ESTA PRESENTACIÓN ES PARA QUE LOS ESTUDIANTES LA LEAN SOLOS.
+A diferencia de las presentaciones 01-14, esta NO es el guion de una mini clase. No hay una sesión en vivo
+detrás de ella: la sesión A de la semana 1 es programa + presentaciones, y la sesión B es asincrónica
+(el instructor estará viajando). Por eso, esta presentación está escrita en segunda persona, para
+leerse sin narrador, y luego te dirige al notebook para realizar el trabajo.
+Compártela como PDF o HTML antes de que comience el semestre.
 Notebook: ../../notebooks/week-00-programming-with-llms.ipynb
-Lesson plan: ../../weeks/week-00.md
+Plan de la lección: ../../weeks/week-00.md
 ==============================================================================
 -->
 
-# Week 0 — Getting Ready
+# Semana 0 — Preparación
 
-## Programming *with* an LLM, not chatting with one
+## Programar *con* un LLM, no chatear con uno
 
-**CMP-4004** · self-paced · do this before our first class
+**CMP-4004** · a tu propio ritmo · haz esto antes de nuestra primera clase
 
 ---
 
-# What this course does
+# Qué hace este curso
 
-For fourteen weeks you will build a classical AI algorithm, then **measure it
-against an LLM doing the same task.**
+Durante catorce semanas construirás un algoritmo clásico de IA y luego **lo medirás
+frente a un LLM realizando la misma tarea.**
 
 | | |
 |---|---|
-| Weeks 3–11 | search, logic, planning, optimization — **with proofs** |
-| Weeks 12–14 | probability, sequence models, neural networks |
-| **Every week** | **a measured comparison, and a scorecard** |
+| Semanas 3–11 | búsqueda, lógica, planificación, optimización — **con demostraciones** |
+| Semanas 12–14 | probabilidad, modelos de secuencia, redes neuronales |
+| **Cada semana** | **una comparación medida y una ficha de evaluación** |
 
-The classical material is **not history**. It is the **control group.**
+El material clásico **no es historia**. Es el **grupo de control.**
 
-> ## This is not an anti-LLM course, and not an LLM-hype course.
-> ## It is a course about knowing what you can prove.
+> ## Este no es un curso anti-LLM ni un curso de exageración sobre los LLM.
+> ## Es un curso sobre saber qué puedes demostrar.
 
 ---
 
-# Why Week 0 exists
+# Por qué existe la Semana 0
 
-The comparison is only worth something if **the LLM side is done properly.**
+La comparación solo tiene valor si **la parte del LLM se hace correctamente.**
 
-| Chatting with a model | Programming with one |
+| Chatear con un modelo | Programar con uno |
 |---|---|
-| interactive | **batched** |
-| forgiving | **parsed and validated** |
-| unreproducible | **cached and seeded** |
-| one answer | **120 instances and a curve** |
+| interactivo | **por lotes** |
+| tolerante | **analizado y validado** |
+| irreproducible | **almacenado en caché y con semilla fija** |
+| una respuesta | **120 instancias y una curva** |
 
-You are going to put numbers in a report that someone will challenge. Week 0 is
-where you build the machinery that makes those numbers defensible.
+Vas a poner números en un informe que alguien cuestionará. La Semana 0 es
+donde construyes la infraestructura que hace que esos números sean defendibles.
 
-**Budget: 90–120 minutes, plus download time.**
-
----
-
-# What you need (and what you do *not*)
-
-## Required
-
-- **Python 3.10+** and about 15 minutes of `pip install`
-- Any laptop. **4 cores and 8 GB RAM is enough.**
-
-## ⚠️ NOT required — ever, for full marks
-
-- A GPU
-- A paid API key
-- A cloud account
-- A credit card
-
-Every lab in this course runs on the weakest realistic machine. That is a design
-constraint, not an aspiration.
+**Tiempo estimado: 90–120 minutos, más el tiempo de descarga.**
 
 ---
 
-# Three LLM backends. The third always works.
+# Lo que necesitas (y lo que *no*)
 
-| Backend | What it needs | Speed |
+## Requerido
+
+- **Python 3.10+** y aproximadamente 15 minutos de `pip install`
+- Cualquier laptop. **4 núcleos y 8 GB de RAM son suficientes.**
+
+## ⚠️ NO se requiere — nunca, para obtener la calificación completa
+
+- Una GPU
+- Una clave API pagada
+- Una cuenta en la nube
+- Una tarjeta de crédito
+
+Cada laboratorio de este curso funciona en la máquina razonablemente más débil. Eso es una restricción
+de diseño, no una aspiración.
+
+---
+
+# Tres backends de LLM. El tercero siempre funciona.
+
+| Backend | Qué necesita | Velocidad |
 |---|---|---|
-| **`ollama`** | ~2 GB download, 4 GB free RAM | 5–20 tokens/s on CPU |
-| **`api`** | your own key, if you happen to have one | fast |
-| **`manual`** | **any chat interface, anywhere** | slow but universal |
+| **`ollama`** | ~2 GB de descarga, 4 GB de RAM libre | 5–20 tokens/s en CPU |
+| **`api`** | tu propia clave, si resulta que tienes una | rápido |
+| **`manual`** | **cualquier interfaz de chat, en cualquier lugar** | lento pero universal |
 
-## `LLM backend: manual` is a PASS
+## `LLM backend: manual` es APROBADO
 
-If Ollama will not install on your machine, **you are not behind.** You will paste
-prompts into a chat window, run smaller benchmarks, note the reduced *n* in your
-report, and **lose no marks for it.**
+Si Ollama no se instala en tu máquina, **no estás atrasado.** Pegarás
+prompts en una ventana de chat, ejecutarás benchmarks más pequeños, indicarás el *n* reducido en tu
+informe y **no perderás puntos por ello.**
 
-Ask for help early if you are stuck. A problem posted on Thursday is fifteen
-minutes of someone's time.
-
----
-
-# Why a *small* local model is better here
-
-`qwen2.5:3b` is not very good. **That is the point.**
-
-- Its failures are **frequent**, **visible**, and **instructive**
-- When a 3B model fabricates an invalid A\* path, the lesson lands
-- When a frontier model gets it right, it does so for reasons you **cannot
-  inspect** — and you learn nothing about *why*
-
-> ## You are studying the failure modes of a class of system.
-> ## A system that rarely fails is a bad specimen.
+Pide ayuda pronto si estás atascado. Un problema publicado el jueves le toma quince
+minutos a alguien.
 
 ---
 
-# ⚠️ The hard part: prose is not data
+# Por qué un modelo local *pequeño* es mejor aquí
 
-An LLM returns **text**. Your experiment needs a **number**.
+`qwen2.5:3b` no es muy bueno. **Ese es el punto.**
 
-All ten of these are reasonable answers to *"what is 2+2?"*:
+- Sus fallos son **frecuentes**, **visibles** e **instructivos**
+- Cuando un modelo 3B fabrica una ruta A\* inválida, la lección queda clara
+- Cuando un modelo de frontera lo hace correctamente, lo hace por razones que **no puedes
+  inspeccionar** — y no aprendes nada sobre *por qué*
+
+> ## Estás estudiando los modos de fallo de una clase de sistema.
+> ## Un sistema que rara vez falla es un mal espécimen.
+
+---
+
+# ⚠️ La parte difícil: la prosa no son datos
+
+Un LLM devuelve **texto**. Tu experimento necesita un **número**.
+
+Las diez siguientes son respuestas razonables a *"what is 2+2?"*:
 
 ```
 4                                    Four.
@@ -128,115 +128,115 @@ The answer is 4.                     ```\n4\n```
 I think it's 4, but it depends       (empty string)
 ```
 
-`int(text.strip())` handles **one** of them.
+`int(text.strip())` maneja **una** de ellas.
 
-The gap between prose and data is where **silent measurement errors** live — and
-the notebook makes you feel it before it can cost you a grade.
-
----
-
-# The fix, in priority order
-
-## 1 · Constrain the format in the prompt
-
-Cheapest and most effective. `"Reply with exactly: ANSWER: <number>"`
-
-## 2 · Parse defensively
-
-Return `(value, failure_mode)`. Have an explicit **"could not parse"** outcome.
-
-## 3 · ⚠️ Never silently coerce
-
-> A `None` that you **counted** is a data point.
-> A `0` that you **invented** is a lie in your results table.
-
-### The case that teaches the most
-
-`"42 is the answer to 2+2? No — 4."` → two numbers, no marker.
-
-First-number and last-number parsers **disagree**, and both are guesses dressed as
-measurements. The honest answer is `ambiguous`, and it belongs in your
-**failure-mode** column, not your accuracy column.
+La brecha entre prosa y datos es donde viven los **errores silenciosos de medición** — y
+el notebook hace que los experimentes antes de que puedan costarte una calificación.
 
 ---
 
-# The cache is not an optimization
+# La solución, en orden de prioridad
 
-Every call is stored, keyed by `SHA-256(backend, model, prompt, temperature, seed)`.
+## 1 · Restringe el formato en el prompt
 
-| Reason | Why it is course content |
+La opción más barata y efectiva. `"Reply with exactly: ANSWER: <number>"`
+
+## 2 · Analiza de forma defensiva
+
+Devuelve `(value, failure_mode)`. Ten un resultado explícito de **"no se pudo analizar"**.
+
+## 3 · ⚠️ Nunca hagas coerción silenciosa
+
+> Un `None` que **contaste** es un punto de datos.
+> Un `0` que **inventaste** es una mentira en tu tabla de resultados.
+
+### El caso que más enseña
+
+`"42 is the answer to 2+2? No — 4."` → dos números, sin marcador.
+
+Los analizadores del primer número y del último número **no coinciden**, y ambos son suposiciones disfrazadas de
+mediciones. La respuesta honesta es `ambiguous`, y pertenece a tu
+columna de **modo de fallo**, no a tu columna de precisión.
+
+---
+
+# La caché no es una optimización
+
+Cada llamada se almacena, con una clave `SHA-256(backend, model, prompt, temperature, seed)`.
+
+| Razón | Por qué forma parte del contenido del curso |
 |---|---|
-| **Reproducibility** | a graded claim must be re-derivable |
-| **Cost** | you will rewrite your analysis ten times; inference is slow |
-| **Honesty** | it makes *"we ran 30 instances"* **checkable** |
+| **Reproducibilidad** | una afirmación evaluada debe poder volver a derivarse |
+| **Costo** | reescribirás tu análisis diez veces; la inferencia es lenta |
+| **Honestidad** | hace que *"ejecutamos 30 instancias"* sea **verificable** |
 
-## You commit `.llm_cache/` to your repo
+## Haces commit de `.llm_cache/` en tu repo
 
-It is **raw data**, not build output. It is the evidence behind your claims.
-
----
-
-# ⚠️ Your parser is part of your experiment
-
-Two ways to accidentally cheat, both common, both easy to avoid:
-
-## Tuning the parser until the LLM looks good
-
-Then you have measured **your parser**. Write it *before* you see the results, and
-report how many outputs it failed to parse.
-
-## Trying four prompts and reporting the best
-
-That is **p-hacking**. Legitimate procedure:
-
-1. Choose your prompt on a small **development set**
-2. **Freeze it**
-3. *Then* run the benchmark
-4. State in the report which prompt you used and how you chose it
-
-**Give both sides the same care.** An hour tuning the prompt and a default
-heuristic is not a fair comparison.
+Son **datos crudos**, no salida de compilación. Es la evidencia detrás de tus afirmaciones.
 
 ---
 
-# The verifier — today's real lesson
+# ⚠️ Tu parser forma parte de tu experimento
 
-Your first comparison is **sorting a list of integers**: trivial classically,
-**exactly verifiable**, and it scales.
+Dos formas de hacer trampa accidentalmente, ambas comunes y ambas fáciles de evitar:
 
-The verifier checks three things **separately**:
+## Ajustar el parser hasta que el LLM se vea bien
 
-| Check | Failure mode | What it means |
+Entonces has medido **tu parser**. Escríbelo *antes* de ver los resultados y
+reporta cuántas salidas no pudo analizar.
+
+## Probar cuatro prompts y reportar el mejor
+
+Eso es **p-hacking**. Procedimiento legítimo:
+
+1. Elige tu prompt usando un pequeño **conjunto de desarrollo**
+2. **Congélalo**
+3. *Luego* ejecuta el benchmark
+4. Indica en el informe qué prompt usaste y cómo lo elegiste
+
+**Da a ambos lados el mismo cuidado.** Una hora ajustando el prompt y una heurística
+por defecto no es una comparación justa.
+
+---
+
+# El verificador — la verdadera lección de hoy
+
+Tu primera comparación es **ordenar una lista de enteros**: trivial de forma clásica,
+**exactamente verificable** y escalable.
+
+El verificador comprueba tres cosas **por separado**:
+
+| Comprobación | Modo de fallo | Qué significa |
 |---|---|---|
-| parses at all | `malformed` | output was not a list |
-| same multiset | `invalid` | **dropped or invented numbers** |
-| non-decreasing | `wrong-but-confident` | right numbers, wrong order |
+| se puede analizar | `malformed` | la salida no era una lista |
+| mismo multiconjunto | `invalid` | **eliminó o inventó números** |
+| no decreciente | `wrong-but-confident` | números correctos, orden incorrecto |
 
-Lumping these together as "wrong" throws away the most interesting part of your
-data. A model that drops one element has a **different** problem from one that
-mis-orders.
+Agrupar todo esto como "incorrecto" elimina la parte más interesante de tus
+datos. Un modelo que elimina un elemento tiene un problema **diferente** al de uno que
+ordena mal.
 
 ---
 
-# ⚠️ Test the verifier before you trust it
+# ⚠️ Prueba el verificador antes de confiar en él
 
-The notebook asserts it against five cases with known answers **before** using it
-on a single model output.
+El notebook lo verifica con cinco casos cuyas respuestas se conocen **antes** de usarlo
+sobre una sola salida del modelo.
 
-> ## A broken verifier does not crash.
-> ## It silently produces a plausible number that you then publish.
+> ## Un verificador roto no se bloquea.
+> ## Produce silenciosamente un número plausible que luego publicas.
 
-You will meet this exact lesson twice more:
+Encontrarás exactamente esta misma lección dos veces más:
 
-| Week | The verifier |
+| Semana | El verificador |
 |---|---|
-| **0** | your sort checker |
-| **9** | a sound plan validator — *the keystone of the course* |
-| **14** | gradient checking your own backprop |
+| **0** | tu comprobador de ordenamiento |
+| **9** | un validador de planes correcto — *la piedra angular del curso* |
+| **14** | comprobación de gradientes de tu propia retropropagación |
 
 ---
 
-# The pattern you will use fourteen times
+# El patrón que usarás catorce veces
 
 ```
         ┌─────────────┐
@@ -256,13 +256,13 @@ You will meet this exact lesson twice more:
    scorecard + scaling curve + honesty section
 ```
 
-Every duel is this diagram with a different box in the middle.
+Cada duelo es este diagrama con una caja diferente en el medio.
 
 ---
 
-# One point is not a curve
+# Un punto no es una curva
 
-The scorecard has eight axes. **Axis 6 is where this course lands.**
+La ficha de evaluación tiene ocho ejes. **El eje 6 es donde este curso hace énfasis.**
 
 ```
 solve rate
@@ -275,72 +275,72 @@ solve rate
         4    8   12   16    problem size
 ```
 
-**Minimum for every duel: four problem sizes, ten instances each.**
+**Mínimo para cada duelo: cuatro tamaños de problema, diez instancias cada uno.**
 
-If your plot shows **no** cliff, that is an interesting result — but you must show
-the plot.
-
----
-
-# The axis students undervalue
-
-## Axis 2 — Guarantee
-
-These are **not** the same kind of claim:
-
-> `sorted()` returns a permutation of its input in non-decreasing order, for
-> **every** input, in O(n log n). **No condition.**
-
-> The LLM produced a correct sort on 12/20 instances.
-> **No claim is made about the 21st.**
-
-Telling those apart is the entire subject of this course.
-
-State every guarantee as a **conditional**: *A\* is optimal **provided** `h` never
-overestimates.*
+Si tu gráfico **no** muestra un precipicio, ese es un resultado interesante — pero debes mostrar
+el gráfico.
 
 ---
 
-# We grade the experiment, not the verdict
+# El eje que los estudiantes subestiman
 
-| Score | Meaning |
+## Eje 2 — Garantía
+
+Estas **no** son el mismo tipo de afirmación:
+
+> `sorted()` devuelve una permutación de su entrada en orden no decreciente, para
+> **toda** entrada, en O(n log n). **Sin condición.**
+
+> El LLM produjo un ordenamiento correcto en 12/20 instancias.
+> **No se hace ninguna afirmación sobre la número 21.**
+
+Distinguir estas dos cosas es el tema completo de este curso.
+
+Expresa cada garantía como una **condicional**: *A\* es óptimo **siempre que** `h` nunca
+sobreestime.*
+
+---
+
+# Evaluamos el experimento, no el veredicto
+
+| Puntuación | Significado |
 |---|---|
-| 0 | not addressed |
-| 1 | asserted ("it was faster") |
-| 2 | measured once |
-| 3 | measured across instances, with a statistic |
-| 4 | **across instances *and* sizes, with variance and a stated limitation** |
+| 0 | no abordado |
+| 1 | afirmado ("fue más rápido") |
+| 2 | medido una vez |
+| 3 | medido en varias instancias, con una estadística |
+| 4 | **en varias instancias *y* tamaños, con varianza y una limitación indicada** |
 
-> ## A careful study concluding "the LLM won" scores higher than a sloppy study
-> ## concluding "classical won."
+> ## Un estudio cuidadoso que concluya "el LLM ganó" obtiene mayor puntuación que un estudio descuidado
+> ## que concluya "ganó el método clásico."
 
-### And every report has a section titled *"Where we may have been unfair"*
+### Y cada informe tiene una sección titulada *"Where we may have been unfair"*
 
-It is worth real credit. **A student who finds a genuine flaw in their own
-experiment has learned the thing this course is actually teaching.**
+Da puntos reales. **Un estudiante que encuentra una falla genuina en su propio
+experimento ha aprendido lo que este curso realmente está enseñando.**
 
 ---
 
-# Your Week 0 deliverable
+# Tu entrega de la Semana 0
 
-In `week00/` of your course repo, before our first class:
+En `week00/` de tu repo del curso, antes de nuestra primera clase:
 
-| # | File | What |
+| # | Archivo | Qué |
 |---|---|---|
-| 1 | `doctor.txt` | output of `python -m aicourse.doctor` |
-| 2 | `first_comparison.md` | your table + scorecard, **all four TODOs filled in** |
-| 3 | *(forum)* | **one** Failure Atlas entry, in the required format |
-| 4 | *(forum)* | **one** reply to a classmate, naming something specific |
-| 5 | `AI_LOG.md` | started — used an assistant? log it. That is allowed. |
+| 1 | `doctor.txt` | salida de `python -m aicourse.doctor` |
+| 2 | `first_comparison.md` | tu tabla + ficha de evaluación, **los cuatro TODO completados** |
+| 3 | *(foro)* | **una** entrada en el Failure Atlas, en el formato requerido |
+| 4 | *(foro)* | **una** respuesta a un compañero, mencionando algo específico |
+| 5 | `AI_LOG.md` | iniciado — ¿usaste un asistente? regístralo. Está permitido. |
 
-Small credit. Mostly it means **your toolchain works before it matters**, and we
-never spend studio time on `PATH` problems.
+Poco puntaje. Principalmente significa que **tu cadena de herramientas funciona antes de que importe**, y
+nunca gastamos tiempo del laboratorio en problemas de `PATH`.
 
 ---
 
-# Failure Atlas entry format
+# Formato de entrada del Failure Atlas
 
-Copy this shape exactly. You will write one every week.
+Copia esta estructura exactamente. Escribirás una cada semana.
 
 ```markdown
 ### [Wk0] LLM drops an element when sorting 40 integers
@@ -354,33 +354,33 @@ Copy this shape exactly. You will write one every week.
   consuming this output silently loses data.
 ```
 
-**"Why it matters" is the part that counts.** One sentence: what would break if
-you shipped it?
+**"Why it matters" es la parte que cuenta.** Una oración: ¿qué se rompería si
+lo pusieras en producción?
 
 ---
 
-# If something is broken
+# Si algo está roto
 
-| Symptom | Fix |
+| Síntoma | Solución |
 |---|---|
-| `ModuleNotFoundError: aicourse` | run Jupyter from `course-en/`, or `pip install -e .` |
-| ollama: `connection refused` | `ollama serve` in another terminal |
-| ollama: `model not found` | `ollama pull qwen2.5:3b` (or `:1.5b` if ≤ 8 GB RAM) |
-| unbearably slow | use `:1.5b`; cut instances; the cache means you pay **once** |
-| nothing works at all | `LLM(backend="manual")` — **a supported path** |
+| `ModuleNotFoundError: aicourse` | ejecuta Jupyter desde `course-en/`, o `pip install -e .` |
+| ollama: `connection refused` | `ollama serve` en otra terminal |
+| ollama: `model not found` | `ollama pull qwen2.5:3b` (o `:1.5b` si tienes ≤ 8 GB de RAM) |
+| insoportablemente lento | usa `:1.5b`; reduce las instancias; la caché significa que pagas **una vez** |
+| nada funciona | `LLM(backend="manual")` — **una opción compatible** |
 
-## Ask early
+## Pide ayuda pronto
 
-A toolchain problem posted **Thursday** costs someone fifteen minutes.
-The same problem at **11 pm before Duel 1** costs you a grade.
+Un problema de la cadena de herramientas publicado el **jueves** le toma a alguien quince minutos.
+El mismo problema a las **11 pm antes del Duelo 1** te cuesta una calificación.
 
 ---
 
-# Start the model download *now*
+# Empieza la descarga del modelo *ahora*
 
-`qwen2.5:3b` is about **2 GB**.
+`qwen2.5:3b` ocupa aproximadamente **2 GB**.
 
-Not tonight. Not before class. **Now**, while you read the rest of this.
+No esta noche. No antes de clase. **Ahora**, mientras lees el resto de esto.
 
 ```bash
 ollama pull qwen2.5:3b
@@ -388,33 +388,33 @@ ollama pull qwen2.5:3b
 
 ---
 
-# What is coming
+# Lo que viene
 
-## Session 1A — What is intelligence?
+## Sesión 1A — ¿Qué es la inteligencia?
 
-Turing's 1950 paper, the history that produced this field, and **ELIZA in 40 lines
-of Python**. A 1966 program with no model of anything, which is unnervingly
-convincing — and which you will then break on purpose.
+El artículo de Turing de 1950, la historia que dio origen a este campo y **ELIZA en 40 líneas
+de Python**. Un programa de 1966 sin un modelo de nada, que resulta inquietantemente
+convincente — y que luego romperás a propósito.
 
-## Session 1B — asynchronous
+## Sesión 1B — asincrónica
 
-Your Week 0 forum posts. Details in the announcement.
+Tus publicaciones del foro de la Semana 0. Detalles en el anuncio.
 
 ---
 
-# Bring one thing to Session 1A
+# Lleva una cosa a la Sesión 1A
 
-> # Which will win more of the fourteen duels — the classical algorithm, or the LLM?
+> # ¿Cuál ganará más de los catorce duelos: el algoritmo clásico o el LLM?
 
-**Write your answer down.** Commit to a number.
+**Escribe tu respuesta.** Comprométete con un número.
 
-We check it in **week 14**, next to the sealed prediction you will write in
-Session 1A.
+Lo revisaremos en la **semana 14**, junto a la predicción sellada que escribirás en
+la Sesión 1A.
 
-> ## Being wrong in public, on the record, with data — that is the job.
+> ## Estar equivocado en público, dejarlo registrado y tener datos — ese es el trabajo.
 
 <!--
-Set the tone here deliberately. Students arrive expecting either an anti-AI
-lecture or an AI-boosterism lecture. Neither is on offer, and saying so in week 0
-prevents two different kinds of disengagement.
+Establece aquí el tono deliberadamente. Los estudiantes llegan esperando una clase anti-IA
+o una clase de exageración pro-IA. Ninguna de las dos se ofrece, y decirlo en la semana 0
+evita dos tipos diferentes de desconexión.
 -->
