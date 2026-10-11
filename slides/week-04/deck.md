@@ -2,61 +2,61 @@
 marp: true
 theme: default
 paginate: true
-header: 'CMP-4004 · Week 4 · Heuristics & A*'
+header: 'CMP-4004 · Semana 4 · Heurísticas y A*'
 ---
 
 <!--
-Week 4 Session A. Mini-lecture budget: 25 minutes.
-Source: 02_Problem.pptx slides 11-16. Beats per lesson plan:
-informed search (4) → A* (6) → PROPERTIES OF HEURISTICS (10, the empty slide,
-written out) → optimality proof (5). Lesson plan: ../../weeks/week-04.md
+Semana 4, sesión A. Tiempo para la miniclase: 25 minutos.
+Fuente: 02_Problem.pptx, diapositivas 11-16. Etapas según el plan de clase:
+búsqueda informada (4) → A* (6) → PROPIEDADES DE LAS HEURÍSTICAS (10, la diapositiva vacía,
+desarrollada) → demostración de optimalidad (5). Plan de clase: ../../weeks/week-04.md
 -->
 
-# Heuristics and A*
+# Heurísticas y A*
 
-## Buying tractability with domain knowledge
+## Hacer el problema tratable mediante conocimiento del dominio
 
-**CMP-4004** · Week 4
+**CMP-4004** · Semana 4
 
 ![bg right:35%](images/slide11-1.jpeg)
 
 ---
 
-# Informed search
+# Búsqueda informada
 
 ![bg right:30%](images/slide12-1.png)
 
-Unlike blind search, it uses **additional knowledge** about the problem to guide
-exploration toward the goal.
+A diferencia de la búsqueda ciega, utiliza **conocimiento adicional** sobre el problema para guiar
+la exploración hacia el objetivo.
 
-That knowledge is encoded in a **heuristic function**:
+Ese conocimiento se representa mediante una **función heurística**:
 
-- `h(n)` = estimated cost from node *n* to the goal
-- `h(n) = 0` if *n* is the goal
-- `h(n) ≥ 0` always
+- `h(n)` = costo estimado desde el nodo *n* hasta el objetivo
+- `h(n) = 0` si *n* es el objetivo
+- `h(n) ≥ 0` siempre
 
-A heuristic **does not guarantee** the correct path — it is an estimate.
-A good one **dramatically** reduces the nodes explored.
+Una heurística **no garantiza** el camino correcto: es una estimación.
+Una buena heurística reduce **drásticamente** los nodos explorados.
 
 ---
 
-# Greedy best-first search
+# Búsqueda voraz primero el mejor
 
 ![bg right:35%](images/slide13-1.png)
 
-Always expands the node that *appears* closest to the goal, by `h(n)` alone.
-**Frontier: priority queue on `h(n)`.**
+Siempre expande el nodo que *parece* estar más cerca del objetivo, usando solo `h(n)`.
+**Frontera: cola de prioridad según `h(n)`.**
 
-It is **greedy** — locally optimal at each step, ignoring accumulated cost.
+Es **voraz**: elige lo localmente óptimo en cada paso e ignora el costo acumulado.
 
-- **Complete** only when repeated states are controlled
-- **Not optimal** — no guarantee of the lowest-cost path
-- Can be trapped in bad paths when the heuristic is misleading
+- **Completa** solo cuando se controlan los estados repetidos
+- **No es óptima** — no garantiza el camino de menor costo
+- Puede quedar atrapada en caminos malos cuando la heurística es engañosa
 
 <!--
-4 min for informed search + greedy. Draw a map where greedy walks confidently
-into a dead end. The failure motivates the g term on the next slide, so show
-the failure first.
+4 min para búsqueda informada y voraz. Dibuja un mapa donde la búsqueda voraz avance con confianza
+hacia un callejón sin salida. El fallo justifica el término g de la siguiente diapositiva, así que
+muestra primero el fallo.
 -->
 
 ---
@@ -67,190 +67,190 @@ the failure first.
 
 # `f(n) = g(n) + h(n)`
 
-- `g(n)` — **actual** accumulated cost from the start to *n*
-- `h(n)` — **estimated** lowest cost from *n* to the goal
-- `f(n)` — estimated total cost of the path **through** *n*
+- `g(n)` — costo **real** acumulado desde el inicio hasta *n*
+- `h(n)` — menor costo **estimado** desde *n* hasta el objetivo
+- `f(n)` — costo total estimado del camino que **pasa por** *n*
 
-Always expands the node with the lowest `f(n)`.
-**Frontier: priority queue on `f(n)`.**
+Siempre expande el nodo con el menor `f(n)`.
+**Frontera: cola de prioridad según `f(n)`.**
 
-**The intuition in two words:** *g* is what you have spent, *h* is what you expect
-to spend. Minimizing the sum balances **progress** against **promise**.
+**La intuición en dos palabras:** *g* es lo que has gastado; *h* es lo que esperas
+gastar. Minimizar la suma equilibra **avance** y **potencial**.
 
 ---
 
-# A* — properties
+# A* — Propiedades
 
-- **Complete** — always finds a solution if one exists and `h` is admissible
-- **Optimal** — guarantees the lowest-cost path if `h` is admissible/consistent
-- **Space: O(bᵈ)** — it keeps every generated node in memory
-- **Time** — depends entirely on the **quality of `h`**
+- **Completa** — siempre encuentra una solución si existe y `h` es admisible
+- **Óptima** — garantiza el camino de menor costo si `h` es admisible/consistente
+- **Espacio: O(bᵈ)** — conserva en memoria todos los nodos generados
+- **Tiempo** — depende por completo de la **calidad de `h`**
 
-Note what is conditional and what is not. Both headline guarantees have a
-hypothesis attached, and the next slide is about that hypothesis.
+Observa qué es condicional y qué no. Ambas garantías principales tienen una
+hipótesis asociada, y la siguiente diapositiva trata sobre esa hipótesis.
 
 <!--
-6 min for the two A* slides. The space complexity is the practical killer and
-students underrate it: A* on a hard instance dies of memory, not time.
+6 min para las dos diapositivas de A*. La complejidad espacial es el principal obstáculo práctico y
+los estudiantes la subestiman: en una instancia difícil, A* agota la memoria, no el tiempo.
 -->
 
 ---
 
-# Properties of Heuristics
+# Propiedades de las heurísticas
 
 ![bg left:25%](images/slide16-1.png)
 
 <!--
 ==============================================================================
-THIS IS THE SLIDE THAT IS EMPTY IN THE SOURCE DECK.
-02_Problem.pptx slide 16 has the title "Properties of Heuristics" and no body.
-It is written out over the next four slides and it is the 10-minute core of the
-week. Do not compress it. Everything students need for Duel 1 and Checkpoint 1
-is here.
+ESTA ES LA DIAPOSITIVA QUE ESTÁ VACÍA EN LA PRESENTACIÓN ORIGINAL.
+La diapositiva 16 de 02_Problem.pptx tiene el título «Propiedades de las heurísticas» y no tiene contenido.
+Se desarrolla en las cuatro diapositivas siguientes y constituye el núcleo de 10 minutos de la
+semana. No lo comprimas. Todo lo que los estudiantes necesitan para el duelo 1 y el punto de control 1
+está aquí.
 ==============================================================================
 -->
 
-### The four properties that matter
+### Las cuatro propiedades que importan
 
-1. Admissibility
-2. Consistency
-3. Dominance
-4. Effective branching factor
+1. Admisibilidad
+2. Consistencia
+3. Dominancia
+4. Factor de ramificación efectivo
 
-### …and the one idea that generates all heuristics
+### …y la idea que genera todas las heurísticas
 
-5. Relaxed problems
+5. Problemas relajados
 
 ---
 
-# 1 · Admissible
+# 1 · Admisible
 
-## Admissible
+## Admisible
 
 # `h(n) ≤ h*(n)`
 
-Never **overestimates** the true remaining cost. ⟹ **A\* is optimal on trees.**
+Nunca **sobreestima** el costo restante real. ⟹ **A\* es óptima en árboles.**
 
-# 2 Consistent (monotone)
+# 2 Consistente (monótona)
 
 # `h(n) ≤ c(n, a, n′) + h(n′)`
 
-The **triangle inequality** on the heuristic. ⟹ **A\* is optimal on graphs**
-*with* an explored set.
+La **desigualdad triangular** aplicada a la heurística. ⟹ **A\* es óptima en grafos**
+*con* un conjunto de explorados.
 
-**Consistency implies admissibility. Not conversely.**
+**La consistencia implica admisibilidad. La recíproca no se cumple.**
 
 <!--
-Why does an underestimate work but an overestimate not? Get the intuition on the
-board: OPTIMISM means you never prematurely dismiss the cheap path. A pessimistic
-h can make A* ignore the route that was actually best.
+¿Por qué funciona una subestimación y no una sobreestimación? Explica la intuición en la
+pizarra: el OPTIMISMO evita descartar prematuramente el camino barato. Una h pesimista
+puede hacer que A* ignore la ruta que realmente era la mejor.
 -->
 
 ---
 
-# 3 · Dominance
+# 3 · Dominancia
 
-If `h₂(n) ≥ h₁(n)` for all *n*, and **both are admissible**, then h₂ **dominates**
-h₁ — and A* with h₂ expands **no more nodes** than A* with h₁.
+Si `h₂(n) ≥ h₁(n)` para todo *n*, y **ambas son admisibles**, entonces h₂ **domina**
+a h₁, y A* con h₂ **no expande más nodos** que A* con h₁.
 
-> ## A better heuristic is a strictly better one.
-> ## More informed is never worse.
+> ## Una heurística mejor es estrictamente mejor.
+> ## Más informada nunca es peor.
 
-This is unusual and worth pausing on. Most engineering trade-offs are trade-offs.
-This one is not: within admissibility, closer to `h*` is free.
+Esto es inusual y merece una pausa. La mayoría de las decisiones de ingeniería implican concesiones.
+Esta no: dentro de la admisibilidad, acercarse a `h*` no cuesta nada.
 
 ---
 
-# 4 · Effective branching factor `b*`
+# 4 · Factor de ramificación efectivo `b*`
 
-The branching factor *b* that a **uniform tree of depth d** would need in order to
-contain the number of nodes A* actually expanded.
+El factor de ramificación *b* que necesitaría un **árbol uniforme de profundidad d** para
+contener la cantidad de nodos que A* realmente expandió.
 
 `N + 1 = 1 + b* + (b*)² + … + (b*)ᵈ`
 
-The practical measure of heuristic quality. **Closer to 1 is better.**
+La medida práctica de la calidad heurística. **Cuanto más cerca de 1, mejor.**
 
-| Heuristic on the 8-puzzle, d = 12 | `b*` (typical) |
+| Heurística en el rompecabezas de 8 fichas, d = 12 | `b*` (típico) |
 |---|---|
-| `h = 0` (i.e. UCS) | ~2.8 |
-| Misplaced tiles | ~1.5 |
-| Manhattan distance | **~1.3** |
+| `h = 0` (es decir, UCS) | ~2.8 |
+| Fichas mal colocadas | ~1.5 |
+| Distancia de Manhattan | **~1.3** |
 
-Small changes in `b*` are enormous changes in work, because it is an exponent.
+Pequeños cambios en `b*` producen enormes cambios en el trabajo, porque se eleva a una potencia.
 
 ---
 
-# 5 · Where heuristics come from: relaxed problems
+# 5 · De dónde vienen las heurísticas: problemas relajados
 
 ![bg right:30%](images/slide16-2.png)
 
-## Every admissible heuristic is the *exact* solution to an easier problem.
+## Toda heurística admisible es la solución *exacta* de un problema más sencillo.
 
-| Heuristic | The relaxation it exactly solves |
+| Heurística | La relajación que resuelve exactamente |
 |---|---|
-| **Misplaced tiles** | a tile can teleport anywhere in one move |
-| **Manhattan distance** | tiles can pass **through** each other |
-| **Straight-line distance** | you can drive through buildings |
+| **Fichas mal colocadas** | una ficha puede teletransportarse a cualquier lugar en un movimiento |
+| **Distancia de Manhattan** | las fichas pueden pasar **a través** de otras |
+| **Distancia en línea recta** | puedes conducir a través de edificios |
 
-Drop a constraint → solve the easier problem exactly → that value can never
-exceed the true cost → **admissible by construction**.
+Elimina una restricción → resuelve exactamente el problema más sencillo → ese valor nunca puede
+superar el costo real → **admisible por construcción**.
 
 <!--
-This is the single most generative idea in the unit. It tells students how to
-INVENT heuristics rather than recall them, and it is the skill Duel 1 grades.
-State the recipe explicitly: list your constraints, cross one out, solve what's
-left. That is a heuristic.
+Esta es la idea más productiva de la unidad. Enseña a los estudiantes cómo
+INVENTAR heurísticas en lugar de recordarlas, y es la habilidad que evalúa el duelo 1.
+Expresa la receta explícitamente: enumera las restricciones, elimina una y resuelve lo que
+queda. Eso es una heurística.
 -->
 
 ---
 
-# A* optimality — the proof
+# Optimalidad de A* — La demostración
 
 ![bg right:28%](images/slide15-1.png)
 
-**Claim.** With admissible `h`, A* returns an optimal solution.
+**Afirmación.** Con una `h` admisible, A* devuelve una solución óptima.
 
-**Suppose not.** A* returns suboptimal goal `G₂` while optimal `G` (cost `C*`)
-exists.
+**Supongamos que no.** A* devuelve un objetivo subóptimo `G₂` aunque existe un objetivo óptimo `G` de costo `C*`
+alcanzable.
 
-1. When `G₂` was selected, some node `n` on the optimal path to `G` was on the
-   frontier.
-2. By admissibility: `f(n) = g(n) + h(n) ≤ g(n) + h*(n) = C*`
-3. Since `G₂` is suboptimal: `f(G₂) = g(G₂) > C*`
-4. Therefore `f(n) < f(G₂)` — so A* would have selected `n` **first**.
+1. Cuando se seleccionó `G₂`, algún nodo `n` del camino óptimo hacia `G` estaba en la
+   frontera.
+2. Por admisibilidad: `f(n) = g(n) + h(n) ≤ g(n) + h*(n) = C*`
+3. Como `G₂` es subóptimo: `f(G₂) = g(G₂) > C*`
+4. Por tanto, `f(n) < f(G₂)`, así que A* habría seleccionado `n` **primero**.
 
-## Contradiction. ∎
+## Contradicción. ∎
 
 <!--
-5 min. Do this properly on the board. It is the only real proof in the course,
-it shows students what the word "guarantee" means on scorecard axis 2, and
-Checkpoint 1 asks for it.
+5 min. Hazlo rigurosamente en la pizarra. Es la única demostración formal del curso,
+muestra a los estudiantes qué significa «garantía» en el eje 2 de la ficha de evaluación y
+se pide en el punto de control 1.
 -->
 
 ---
 
-# Next: live coding — A* is a 10-line diff
+# A continuación: programación en vivo — A* requiere cambiar 10 líneas
 
-Reuse week 3's `search`. Order the frontier by `f` instead of `g`.
+Reutiliza `search` de la semana 3. Ordena la frontera por `f` en lugar de `g`.
 
-Then run **four** heuristics on the same depth-16 instance:
+Después ejecuta **cuatro** heurísticas sobre la misma instancia de profundidad 16:
 
-| Heuristic | Expansions | Solution length | Optimal? |
+| Heurística | Expansiones | Longitud de la solución | ¿Óptima? |
 |---|---|---|---|
 | `h_zero` (= UCS) | ~50,000 | 16 | ✔ |
 | `h_misplaced` | ~1,500 | 16 | ✔ |
 | `h_manhattan` | ~200 | 16 | ✔ |
 | `h_bad = 3 × manhattan` | **~40** | **20** | ✘ |
 
-> **`h_bad` is the fastest and it is wrong.**
+> **`h_bad` es la más rápida y es incorrecta.**
 >
-> You can always buy speed by giving up the guarantee — and if you do not measure
-> solution quality, you will not notice.
+> Siempre puedes ganar velocidad renunciando a la garantía; si no mides
+> la calidad de la solución, no lo notarás.
 
-**That sentence is the bridge to every LLM comparison in this course.**
+**Esa oración conecta con cada comparación con LLM de este curso.**
 
 <!--
-This table is the whole lecture in one artifact. If time is short, cut the proof
-sketch before cutting the table — but try hard to keep both.
-DUEL 1 GOES LIVE THIS WEEK: ../../projects/duel-1-search.md
+Esta tabla reúne toda la clase en un solo recurso. Si falta tiempo, elimina el bosquejo de la
+demostración antes que la tabla, pero intenta conservar ambos.
+EL DUELO 1 COMIENZA ESTA SEMANA: ../../projects/duel-1-search.md
 -->

@@ -2,47 +2,47 @@
 marp: true
 theme: default
 paginate: true
-header: 'CMP-4004 · Week 5 · Adversarial Search & Games'
+header: 'CMP-4004 · Semana 5 · Búsqueda adversarial y juegos'
 ---
 
 <!--
-Week 5 Session A. Mini-lecture budget: 25 minutes.
-Source: 02_Problem.pptx slides 17-22. Beats per lesson plan:
-single→adversarial (3) → minimax (7) → alpha-beta (10) → eval/horizon (5).
-Session B is the TOURNAMENT. Lesson plan: ../../weeks/week-05.md
+Semana 5, sesión A. Tiempo para la miniclase: 25 minutos.
+Fuente: 02_Problem.pptx, diapositivas 17-22. Etapas según el plan de clase:
+un agente→adversarial (3) → minimax (7) → alfa-beta (10) → evaluación/horizonte (5).
+La sesión B es el TORNEO. Plan de clase: ../../weeks/week-05.md
 -->
 
-# Adversarial Search and Games
+# Búsqueda adversarial y juegos
 
-## When something is trying to make you lose
+## Cuando alguien intenta hacerte perder
 
-**CMP-4004** · Week 5
+**CMP-4004** · Semana 5
 
 ![bg right:35%](images/slide17-1.jpeg)
 
 ---
 
-# From one agent to two
+# De un agente a dos
 
-So far: **one agent** searching for a solution in a cooperative or neutral
-environment.
+Hasta ahora: **un agente** que busca una solución en un entorno cooperativo o
+neutral.
 
-In games: **two or more agents with opposing objectives.**
+En los juegos: **dos o más agentes con objetivos opuestos.**
 
-The problem is no longer finding a path to the goal. It is finding the **optimal
-strategy** — while assuming the opponent also plays optimally.
+El problema ya no consiste en encontrar un camino hacia el objetivo. Consiste en encontrar la **estrategia
+óptima**, suponiendo que el oponente también juega de manera óptima.
 
-### The assumptions we start with
+### Las suposiciones iniciales
 
-- Two players: **MAX** and **MIN**
-- **Zero-sum**: one player's gain is the other's loss
-- **Perfect information**: fully observable
-- **Deterministic**: no randomness
+- Dos jugadores: **MAX** y **MIN**
+- **Suma cero**: la ganancia de un jugador es la pérdida del otro
+- **Información perfecta**: completamente observable
+- **Determinista**: sin aleatoriedad
 
 <!--
-3 min. Name the shift precisely: the SOLUTION SHAPE changes. In weeks 3-4 a
-solution was a sequence. Here it is a policy — contingent on what they do. That
-is why you cannot just re-run A*.
+3 min. Describe el cambio con precisión: cambia la FORMA DE LA SOLUCIÓN. En las semanas 3-4, una
+solución era una secuencia. Aquí es una política, condicionada a lo que haga el oponente. Por eso
+no puedes simplemente volver a ejecutar A*.
 -->
 
 ---
@@ -51,11 +51,11 @@ is why you cannot just re-run A*.
 
 ![bg right:35%](images/slide18-1.png)
 
-- **MAX** attempts to maximize the value of the final state
-- **MIN** attempts to minimize that same value
-- Assumes **both players play optimally**
+- **MAX** intenta maximizar el valor del estado final
+- **MIN** intenta minimizar ese mismo valor
+- Supone que **ambos jugadores juegan de manera óptima**
 
-The minimax value of a node, defined recursively:
+El valor minimax de un nodo se define recursivamente:
 
 ```
 minimax(s) = Utility(s)                          if Terminal(s)
@@ -63,199 +63,199 @@ minimax(s) = Utility(s)                          if Terminal(s)
            = min over a of minimax(Result(s,a))  if Player(s) = MIN
 ```
 
-Explores the **complete tree** down to terminal nodes.
-Time **O(bᵐ)** · Space **O(b·m)**
+Explora el **árbol completo** hasta los nodos terminales.
+Tiempo **O(bᵐ)** · Espacio **O(b·m)**
 
 ---
 
-# Minimax assumes a perfect opponent
+# Minimax supone un oponente perfecto
 
-That assumption is not free.
+Esa suposición tiene un costo.
 
-Against a **weak** opponent, minimax can be **suboptimal** — it will not set a
-trap, because it assumes the trap would never be taken.
+Contra un oponente **débil**, minimax puede ser **subóptimo**: no tenderá una
+trampa porque supone que el oponente nunca caerá en ella.
 
-A move that wins 90 % of the time against real humans and loses to a perfect
-player is invisible to minimax.
+Una jugada que gana el 90 % de las veces contra seres humanos reales y pierde contra un jugador
+perfecto es invisible para minimax.
 
 <!--
-7 min for the two minimax slides. WORK A DEPTH-3 TREE BY HAND on the board with
-the class calling out values. Do not skip it — students who have only seen the
-formula cannot trace it, and Checkpoint 1 asks them to trace one.
-The weak-opponent point takes a minute and is a genuine surprise.
+7 min para las dos diapositivas de minimax. RESUELVE A MANO UN ÁRBOL DE PROFUNDIDAD 3 en la pizarra con
+la clase indicando los valores en voz alta. No lo omitas: quienes solo han visto la
+fórmula no pueden seguir su ejecución, y el punto de control 1 les pide hacerlo.
+La observación sobre el oponente débil toma un minuto y resulta sorprendente.
 -->
 
 ---
 
-# α-β pruning
+# Poda α-β
 
 ![bg right:32%](images/slide20-1.jpeg)
 
-Minimax explores the entire tree, which is hopeless for real games.
-**α-β eliminates branches that cannot influence the final decision.**
+Minimax explora todo el árbol, algo inviable en juegos reales.
+**α-β elimina las ramas que no pueden influir en la decisión final.**
 
-- **α** — best value found so far for MAX (a **lower** bound)
-- **β** — best value found so far for MIN (an **upper** bound)
+- **α** — mejor valor encontrado hasta ahora para MAX (una cota **inferior**)
+- **β** — mejor valor encontrado hasta ahora para MIN (una cota **superior**)
 
-### Pruning rule
+### Regla de poda
 
-- If the value at a **MIN** node falls below **α** → prune
-  *(MAX would never choose this path)*
-- If the value at a **MAX** node rises above **β** → prune
-  *(MIN would never choose this path)*
+- Si el valor de un nodo **MIN** cae por debajo de **α** → poda
+  *(MAX nunca elegiría este camino)*
+- Si el valor de un nodo **MAX** supera **β** → poda
+  *(MIN nunca elegiría este camino)*
 
-**It returns exactly the same answer as minimax**, exploring far fewer nodes.
-Best case: **O(b^(m/2))**.
+**Devuelve exactamente la misma respuesta que minimax**, explorando muchos menos nodos.
+Mejor caso: **O(b^(m/2))**.
 
 ---
 
-# Pruning is not approximation
+# La poda no es una aproximación
 
 ![bg right:35%](images/slide21-1.png)
 
-This is worth stating carefully, because students routinely file α-β under
-"heuristic shortcut."
+Vale la pena decirlo con cuidado, porque los estudiantes suelen clasificar α-β como un
+«atajo heurístico».
 
-It is not. α-β discards **only provably irrelevant** branches. The value at the
-root is **identical**.
+No lo es. α-β descarta **solo ramas demostrablemente irrelevantes**. El valor de la
+raíz es **idéntico**.
 
 | | Minimax | α-β |
 |---|---|---|
-| Root value | V | **V** |
-| Nodes visited | ~50,000 | ~4,000 |
-| Guarantee | exact | **exact** |
+| Valor de la raíz | V | **V** |
+| Nodos visitados | ~50,000 | ~4,000 |
+| Garantía | exacta | **exacta** |
 
-Getting the same answer for less work, with no loss, is rare. Notice when it
-happens.
+Obtener la misma respuesta con menos trabajo, sin pérdida, es poco frecuente. Reconoce cuándo
+ocurre.
 
 ---
 
-# The best case requires perfect move ordering
+# El mejor caso requiere un orden perfecto de las jugadas
 
-**O(b^(m/2)) is not what you get by default.** It is what you get if you always
-examine the best move first.
+**O(b^(m/2)) no es lo que obtienes por defecto.** Es lo que obtienes si siempre
+examinas primero la mejor jugada.
 
-| Ordering | Effective branching | Depth reachable in the same budget |
+| Orden | Ramificación efectiva | Profundidad alcanzable con el mismo presupuesto |
 |---|---|---|
-| Worst case | bᵐ (no pruning at all) | d |
-| **Random** | ~b^(3m/4) | ~1.33 d |
-| **Perfect** | b^(m/2) | **2 d** |
+| Peor caso | bᵐ (sin ninguna poda) | d |
+| **Aleatorio** | ~b^(3m/4) | ~1.33 d |
+| **Perfecto** | b^(m/2) | **2 d** |
 
-## Perfect ordering doubles your search depth.
+## Un orden perfecto duplica la profundidad de búsqueda.
 
-And you can approximate it cheaply:
+Y puedes aproximarlo con poco costo:
 
-- try **captures** first
-- try the **previous iteration's best move** first
-  → this is why **iterative deepening + α-β** is the standard pairing
+- prueba primero las **capturas**
+- prueba primero la **mejor jugada de la iteración anterior**
+  → por eso **profundización iterativa + α-β** es la combinación habitual
 
-> A heuristic about the **search order** can matter as much as the evaluation
-> function.
+> Una heurística sobre el **orden de búsqueda** puede importar tanto como la función
+> de evaluación.
 
 <!--
-10 min for the three alpha-beta slides. Trace the SAME depth-3 tree from the
-minimax slide and cross out pruned branches. Half the tree struck through, same
-root value — that visual IS the lesson.
-This ordering table is usually underemphasized and it decides the tournament.
+10 min para las tres diapositivas de alfa-beta. Recorre el MISMO árbol de profundidad 3 de la
+diapositiva de minimax y tacha las ramas podadas. La mitad del árbol tachada y el mismo
+valor en la raíz: esa imagen ES la lección.
+Esta tabla de ordenamiento suele recibir poca atención y decide el torneo.
 -->
 
 ---
 
-# Evaluation functions and the horizon
+# Funciones de evaluación y el horizonte
 
 ![bg right:32%](images/slide22-1.png)
 
-Real games cannot reach terminal nodes. So: **cut off at depth *d* and apply
+En juegos reales no es posible llegar a los nodos terminales. Por tanto: **detén la búsqueda en la profundidad *d* y aplica
 `Eval(s)`.**
 
-`Eval` estimates the utility of a non-terminal position — material, mobility,
-structure. Shannon proposed exactly this in 1950.
+`Eval` estima la utilidad de una posición no terminal: material, movilidad,
+estructura. Shannon propuso exactamente esto en 1950.
 
-## The horizon effect
+## El efecto horizonte
 
-The agent pushes bad news **just past its search depth** and believes it escaped.
+El agente aplaza las malas noticias **justo más allá de su profundidad de búsqueda** y cree que escapó.
 
-*Concrete case:* an engine sacrifices material to delay an unavoidable mate
-beyond its horizon. It "sees" a better score and is simply wrong.
+*Caso concreto:* un motor sacrifica material para retrasar un mate inevitable
+más allá de su horizonte. «Ve» una puntuación mejor y está equivocado.
 
-> **Bounded rationality produces *characteristic* errors, not random ones.**
+> **La racionalidad limitada produce errores *característicos*, no aleatorios.**
 
-That sentence applies to every system in this course, including the LLM.
+Esa oración se aplica a todos los sistemas de este curso, incluido el LLM.
 
 <!--
-5 min. Demo the horizon effect live in the coding block — set up a position where
-a threat resolves at depth 5 and run the agent at depth 4. Students remember it.
+5 min. Demuestra el efecto horizonte en vivo durante el bloque de programación: prepara una posición donde
+una amenaza se resuelva en la profundidad 5 y ejecuta el agente con profundidad 4. Los estudiantes lo recordarán.
 -->
 
 ---
 
-# Shannon's type A / type B
+# Los tipos A y B de Shannon
 
-Shannon (1950) split game programs two ways, and the split still holds:
+Shannon (1950) dividió los programas de juegos en dos tipos, y la distinción sigue vigente:
 
-| | Strategy |
+| | Estrategia |
 |---|---|
-| **Type A** | Search **everything**, shallowly. Brute force. |
-| **Type B** | Search **promising lines** deeply, using knowledge. |
+| **Tipo A** | Buscar en **todo**, con poca profundidad. Fuerza bruta. |
+| **Tipo B** | Buscar profundamente en **líneas prometedoras**, usando conocimiento. |
 
-### Which is an LLM?
+### ¿A cuál corresponde un LLM?
 
-**Neither.** It is a type B *evaluator* with **no search at all** — a case
-Shannon did not anticipate, because in 1950 an evaluation function good enough to
-play without search was inconceivable.
+**A ninguno.** Es un *evaluador* de tipo B **sin ninguna búsqueda**, un caso
+que Shannon no anticipó porque, en 1950, era inconcebible una función de evaluación lo bastante buena
+como para jugar sin buscar.
 
-Ruoss et al. (2024): a 270 M-parameter transformer, trained on 10 M
-Stockfish-annotated games, reaches ~2895 Lichess blitz Elo — **grandmaster
-level, no search at inference.**
+Ruoss y colaboradores (2024): un transformer de 270 millones de parámetros, entrenado con 10 millones de
+partidas anotadas por Stockfish, alcanza aproximadamente 2895 puntos Elo en ajedrez relámpago de Lichess: **nivel de
+gran maestro, sin búsqueda durante la inferencia.**
 
-**So was search ever essential?** The paper's own framing: *amortized planning.*
-The search cost was paid at **training** time. It did not disappear; it moved.
+**Entonces, ¿fue alguna vez esencial la búsqueda?** El propio artículo lo plantea como *planificación amortizada.*
+El costo de búsqueda se pagó durante el **entrenamiento**. No desapareció: cambió de lugar.
 
 <!--
-This slide carries the modern counterpart into the lecture so the paper
-discussion has somewhere to land. Same lesson as Searchformer in week 4,
-arriving from a different direction — make the class notice the convergence.
+Esta diapositiva incorpora la contraparte moderna a la clase para que la discusión del
+artículo tenga un punto de conexión. Es la misma lección que Searchformer en la semana 4,
+desde otra perspectiva: haz que la clase reconozca la convergencia.
 -->
 
 ---
 
-# Next: live coding — Connect-4
+# A continuación: programación en vivo — Conecta 4
 
-Build the game, then minimax, then α-β. Instrument every node.
+Construye el juego, después minimax y luego α-β. Registra cada nodo.
 
-**Three demonstrations, in order:**
+**Tres demostraciones, en orden:**
 
-1. **Same answer, fewer nodes.** Assert both return identical values at depth 6,
-   then print the counts.
-2. **Move ordering.** Sort moves center-first instead of left-to-right. One line;
-   the count often halves again.
-3. **The horizon effect, live.** A threat that resolves at depth 5, an agent
-   searching to depth 4.
+1. **La misma respuesta, menos nodos.** Comprueba con una aserción que ambos devuelven valores idénticos a profundidad 6;
+   después muestra los conteos.
+2. **Orden de las jugadas.** Ordena las jugadas empezando por el centro en lugar de ir de izquierda a derecha. Una línea;
+   el conteo suele reducirse otra vez a la mitad.
+3. **El efecto horizonte, en vivo.** Una amenaza que se resuelve en profundidad 5 y un agente
+   que busca hasta profundidad 4.
 
 ---
 
-# Session 5B — The Tournament
+# Sesión 5B — El torneo
 
-## Submit an agent
+## Entrega un agente
 
 ```python
 def choose_move(board, time_budget_ms) -> int: ...
 ```
 
-**Hard rules:** 500 ms per move · no external processes · no network calls ·
-no opening book larger than 20 positions.
+**Reglas estrictas:** 500 ms por jugada · sin procesos externos · sin llamadas de red ·
+sin un libro de aperturas de más de 20 posiciones.
 
-**Due 24 h before Session 5B** so it can be smoke-tested.
+**Entrega 24 h antes de la sesión 5B** para poder realizar una prueba básica.
 
-Round-robin, every pair against every other, both colors. Then an **LLM
-challenger** enters the bracket.
+Todos contra todos: cada pareja juega contra las demás, con ambos colores. Después entra un **LLM
+retador** en el cuadro del torneo.
 
 <!--
-Predict before each match. When an agent loses, ask its authors what happened.
-Recurring outcomes worth narrating: a sophisticated evaluation losing to a
-simpler agent that searched two plies deeper (DEPTH OFTEN BEATS KNOWLEDGE at
-this scale); somebody timing out and forfeiting (which is what makes iterative
-deepening an ANYTIME algorithm, not just a memory trick).
-Keep an unlabeled reference alpha-beta agent at depth 6 in the bracket and
-reveal it at the end.
+Haz predicciones antes de cada partida. Cuando un agente pierda, pregunta a sus autores qué ocurrió.
+Resultados recurrentes que vale la pena comentar: una evaluación sofisticada pierde contra un
+agente más simple que busca dos medias jugadas más profundo (LA PROFUNDIDAD SUELE SUPERAR AL CONOCIMIENTO a
+esta escala); alguien agota el tiempo y pierde por ello (lo que convierte a la profundización
+iterativa en un algoritmo que puede interrumpirse en CUALQUIER MOMENTO, no solo en un truco de memoria).
+Incluye en el cuadro un agente alfa-beta de referencia sin identificar, con profundidad 6, y
+revélalo al final.
 -->

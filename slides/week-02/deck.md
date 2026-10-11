@@ -2,81 +2,81 @@
 marp: true
 theme: default
 paginate: true
-header: 'CMP-4004 · Week 2 · Intelligent Agents'
+header: 'CMP-4004 · Semana 2 · Agentes inteligentes'
 ---
 
 
-# Intelligent Agents
+# Agentes inteligentes
 
-## The abstraction that survives everything
+## La abstracción que resiste todos los cambios
 
-**CMP-4004** · Week 2
+**CMP-4004** · Semana 2
 
 ![bg right:35%](images/slide01-1.jpeg)
 
 ---
 
-# What is an agent?
+# ¿Qué es un agente?
 
 ![bg right:40%](images/slide02-1.png)
 
-Anything that **perceives** its environment through sensors and **acts** on it
-through actuators.
+Cualquier entidad que **percibe** su entorno mediante sensores y **actúa** sobre él
+mediante actuadores.
 
-| | Sensors | → | Actuators |
+| | Sensores | → | Actuadores |
 |---|---|---|---|
-| **Human** | eyes, ears | brain | hands, mouth |
-| **Robot** | cameras, sensors | processor | motors |
-| **Software agent** | keyboard, file input | program | screen, network |
+| **Ser humano** | ojos, oídos | cerebro | manos, boca |
+| **Robot** | cámaras, sensores | procesador | motores |
+| **Agente de software** | teclado, entrada de archivos | programa | pantalla, red |
 
-That is the whole definition. It is from 1995 and it still holds — including for
-anything marketed as an "AI agent" in 2026.
+Esa es toda la definición. Data de 1995 y sigue vigente, incluso para
+cualquier producto comercializado como «agente de IA» en 2026.
 
 <!--
-NOTE ON THE SOURCE DECK: slide 2 of 03_Intelligent Agents.pptx carries three
-bullets about propositions and logical connectives — pasted in from the
-propositional-logic deck. They do not belong on a slide titled "What Is an
-Agent?" and they are replaced here. If you show the original file, skip them.
+NOTA SOBRE LA PRESENTACIÓN ORIGINAL: la diapositiva 2 de 03_Intelligent Agents.pptx contiene tres
+viñetas sobre proposiciones y conectores lógicos, copiadas de la
+presentación de lógica proposicional. No corresponden a una diapositiva titulada «¿Qué es un
+agente?» y aquí se sustituyen. Si muestras el archivo original, omítelas.
 -->
 
 ---
 
-# Agent *function* vs. agent *program*
+# *Función* del agente frente a *programa* del agente
 
 ![bg right:30%](images/slide03-1.svg)
 
-| **Agent function** | **Agent program** |
+| **Función del agente** | **Programa del agente** |
 |---|---|
-| Abstract behavioral specification | Concrete implementation |
-| Defines what to do in *every* possible situation | Runs on real physical architecture |
-| Maps percept **history** to action: `f : P* → A` | Approximates `f` compactly and efficiently |
-| In theory, a lookup table | |
-| *What we want to achieve* | *How we approximate it efficiently* |
+| Especificación abstracta del comportamiento | Implementación concreta |
+| Define qué hacer en *cada* situación posible | Se ejecuta en una arquitectura física real |
+| Asigna una acción al **historial** de percepciones: `f : P* → A` | Aproxima `f` de forma compacta y eficiente |
+| En teoría, una tabla de consulta | |
+| *Lo que queremos lograr* | *Cómo lo aproximamos de manera eficiente* |
 
 ---
 
-# Why the table is not an option
+# Por qué la tabla no es una opción
 
 ![bg right:35%](images/slide04-1.png)
 
-**Vacuum world.** Two rooms, A and B; each may be dirty or clean.
-Sensors: current position + room status. Actuators: Left, Right, Suck.
+**Mundo de la aspiradora.** Dos habitaciones, A y B; cada una puede estar sucia o limpia.
+Sensores: posición actual + estado de la habitación. Actuadores: izquierda, derecha, aspirar.
 
-With *T* time steps, the percept-history table has **4^T rows**.
+Con *T* pasos de tiempo, la tabla de historiales de percepción tiene **4^T filas**.
 
-| T | Rows |
+| T | Filas |
 |---|---|
 | 5 | 1,024 |
 | 10 | ~10⁶ |
 | **20** | **~10¹²** |
 
-> **All of AI is the search for compact programs that approximate intractable
-> functions.**
+> **Toda la IA consiste en buscar programas compactos que aproximen funciones
+> intratables.**
 
 <!--
-5 min for this and the previous slide together. Make them compute T=20 —
-do not just show the number.
-That closing sentence justifies weeks 3-14. Say it exactly once, and slowly.
+5 min para esta diapositiva y la anterior juntas. Haz que calculen T=20:
+no te limites a mostrar el número.
+La oración final justifica las semanas 3-14. Dila exactamente una vez y despacio.
 -->
 
 ---
@@ -87,217 +87,217 @@ That closing sentence justifies weeks 3-14. Say it exactly once, and slowly.
 
 | | |
 |---|---|
-| **P**erformance | The success criterion |
-| **E**nvironment | The world the agent operates in |
-| **A**ctuators | Mechanisms for acting on it |
-| **S**ensors | Mechanisms for perceiving it |
+| **P** (rendimiento) | El criterio de éxito |
+| **E**ntorno | El mundo en el que opera el agente |
+| **A**ctuadores | Mecanismos para actuar sobre él |
+| **S**ensores | Mecanismos para percibirlo |
 
-### Automated taxi
+### Taxi automatizado
 
-- **P** — safe, fast, legal, comfortable, profitable *(these conflict)*
-- **E** — roads, traffic, pedestrians, weather
-- **A** — steering, throttle, brake, signals, horn, display
-- **S** — cameras, lidar, GPS, speedometer, accelerometer
+- **P** — seguro, rápido, legal, cómodo, rentable *(estos criterios entran en conflicto)*
+- **E** — carreteras, tráfico, peatones, clima
+- **A** — dirección, acelerador, freno, señales, bocina, pantalla
+- **S** — cámaras, lidar, GPS, velocímetro, acelerómetro
 
 <!--
-5 min. ONE example done properly, not four superficially. The payload is that
-the P components conflict — which is exactly why utility-based agents exist,
-four slides from now.
+5 min. UN ejemplo bien desarrollado, no cuatro tratados superficialmente. La idea central es que
+los componentes de P entran en conflicto: precisamente por eso existen los agentes basados en utilidad,
+que veremos cuatro diapositivas más adelante.
 -->
 
 ---
 
-# Rationality
+# Racionalidad
 
 ![bg right:32%](images/slide05-2.png)
 
-A **rational agent** selects, at every moment, the action that maximizes the
-**expected value of a performance measure**, given its percept history and
-built-in knowledge.
+Un **agente racional** selecciona, en cada momento, la acción que maximiza el
+**valor esperado de una medida de rendimiento**, dados su historial de percepciones y
+el conocimiento que incorpora.
 
-Which may require it to:
+Eso puede requerir que:
 
-- **Explore** the environment to gather useful information
-- **Learn** from its percepts to improve future behavior
+- **Explore** el entorno para recopilar información útil
+- **Aprenda** de sus percepciones para mejorar su comportamiento futuro
 
-Rational ≠ omniscient. Rational ≠ correct in hindsight.
+Racional ≠ omnisciente. Racional ≠ acertado en retrospectiva.
 
 ---
 
-# The performance measure is *your* problem
+# La medida de rendimiento es *tu* problema
 
-The performance measure is an **external** criterion. **It is defined by the
-designer, not by the agent.**
+La medida de rendimiento es un criterio **externo**. **La define quien diseña
+el sistema, no el agente.**
 
-> ## ⚠️ You get what you ask for.
-> ## A poor measure produces unintended behavior.
+> ## ⚠️ Obtienes lo que pides.
+> ## Una medida deficiente produce comportamientos no deseados.
 
-- What happens if we specify it incorrectly?
-- What if we do not specify everything?
+- ¿Qué ocurre si la especificamos incorrectamente?
+- ¿Qué ocurre si no especificamos todo?
 
-**Reward `dirt collected`** → a perfectly rational vacuum dumps dirt on the floor
-so it can collect it again.
+**Recompensar `dirt collected`** → una aspiradora perfectamente racional arroja suciedad al suelo
+para poder recogerla de nuevo.
 
 <!--
-5 min, and do not rush it. This is the most important line in the source deck.
-This is reward hacking / specification gaming, and it is now the central problem
-in AI safety. The ethics thread of this course starts HERE, in week 2 — not in
-the last lecture. Flag forward to week 14 explicitly.
+5 min; no lo apresures. Esta es la afirmación más importante de la presentación original.
+Esto es manipulación de la recompensa o de la especificación y ahora es el problema central
+de la seguridad de la IA. El hilo ético del curso empieza AQUÍ, en la semana 2, no en
+la última clase. Conéctalo explícitamente con la semana 14.
 -->
 
 ---
 
-# Six environment axes — as engineering costs
+# Seis ejes del entorno como costos de ingeniería
 
 ![bg right:28%](images/slide08-1.jpeg)
 
-| Axis | If it's the hard case, you must add… |
+| Eje | En el caso difícil, debes añadir… |
 |---|---|
-| Partially observable | belief state / state estimation **(wk 12–13)** |
-| Stochastic | probabilistic reasoning, expected utility **(wk 12)** |
-| Sequential | search and planning **(wk 3–9)** |
-| Dynamic | real-time constraints, bounded deliberation |
-| Continuous | discretization or continuous optimization **(wk 10–11)** |
-| Multi-agent | adversarial reasoning **(wk 5)** |
+| Parcialmente observable | estado de creencias / estimación del estado **(sem. 12–13)** |
+| Estocástico | razonamiento probabilístico, utilidad esperada **(sem. 12)** |
+| Secuencial | búsqueda y planificación **(sem. 3–9)** |
+| Dinámico | restricciones de tiempo real, deliberación limitada |
+| Continuo | discretización u optimización continua **(sem. 10–11)** |
+| Multiagente | razonamiento adversarial **(sem. 5)** |
 
-**This table is the syllabus in disguise.** Say so out loud.
+**Esta tabla es el programa del curso disfrazado.** Dilo en voz alta.
 
 ---
 
-# The axes, stated as questions
+# Los ejes formulados como preguntas
 
-| Axis | The question |
+| Eje | La pregunta |
 |---|---|
-| **Observable** | Can the agent access the complete state at all times? Can its sensors detect what matters for choosing an action? Does it need memory? |
-| **Deterministic** | Is the next state fully determined by the current state and the action? *Stochastic:* same input, different outputs. |
-| **Episodic** | Is each percept–action episode independent? Can current decisions affect future ones? |
-| **Static** | Does the environment change while the agent deliberates? *Semi-dynamic:* the world doesn't change but your score does — chess with a clock. |
-| **Discrete** | A finite number of well-defined states, percepts, and actions? |
-| **Single-agent** | Are other agents present — competitive or cooperative? |
+| **Observable** | ¿Puede el agente acceder al estado completo en todo momento? ¿Pueden sus sensores detectar lo relevante para elegir una acción? ¿Necesita memoria? |
+| **Determinista** | ¿El siguiente estado está completamente determinado por el estado actual y la acción? *Estocástico:* misma entrada, distintas salidas. |
+| **Episódico** | ¿Es independiente cada episodio de percepción y acción? ¿Pueden las decisiones actuales afectar las futuras? |
+| **Estático** | ¿Cambia el entorno mientras el agente delibera? *Semidinámico:* el mundo no cambia, pero tu puntuación sí; por ejemplo, el ajedrez con reloj. |
+| **Discreto** | ¿Hay un número finito de estados, percepciones y acciones bien definidos? |
+| **Un solo agente** | ¿Hay otros agentes, competitivos o cooperativos? |
 
 ![](images/slide09-1.jpeg) ![](images/slide10-1.jpeg) ![](images/slide11-1.jpeg) ![](images/slide12-1.png)
 
 ---
 
-# Classify these
+# Clasifica estas tareas
 
-| Task | Obs. | Det. | Epis. | Static | Disc. | Agents |
+| Tarea | Obs. | Det. | Epis. | Estático | Disc. | Agentes |
 |---|---|---|---|---|---|---|
-| Chess with a clock | full | det. | seq. | **semi** | disc. | multi |
-| Poker | **partial** | **stoch.** | seq. | static | disc. | multi |
-| Taxi driving | **partial** | **stoch.** | seq. | **dynamic** | **cont.** | multi |
-| Medical diagnosis | **partial** | **stoch.** | seq. | dynamic | cont. | single |
-| Crossword puzzle | full | det. | seq. | static | disc. | single |
+| Ajedrez con reloj | total | det. | sec. | **semi** | disc. | varios |
+| Póquer | **parcial** | **estoc.** | sec. | estático | disc. | varios |
+| Conducir un taxi | **parcial** | **estoc.** | sec. | **dinámico** | **cont.** | varios |
+| Diagnóstico médico | **parcial** | **estoc.** | sec. | dinámico | cont. | uno |
+| Crucigrama | total | det. | sec. | estático | disc. | uno |
 
-Read the bold entries as a bill of materials. Taxi driving is bold in five
-columns — which is why it is not solved.
+Lee las entradas en negrita como una lista de recursos necesarios. Conducir un taxi tiene negrita en cinco
+columnas: por eso sigue sin estar resuelto.
 
 <!--
-10 min total for the three axis slides. Do the classification as a live poll or
-in chat; it is much better as an activity than as a reveal.
+10 min en total para las tres diapositivas sobre ejes. Haz la clasificación mediante una encuesta en vivo o
+en el chat; funciona mucho mejor como actividad que como respuesta revelada.
 -->
 
 ---
 
-# Four architectures, each fixing the last one's flaw
+# Cuatro arquitecturas, cada una corrige el defecto de la anterior
 
 ![bg right:30%](images/slide14-1.png)
 
-## 1 · Simple reflex agent
+## 1 · Agente reactivo simple
 
-- Considers only the **current percept**. No memory.
-- Operates through **condition–action rules**
-- ✅ Simple and efficient to implement
-- ❌ **Fails in partially observable environments** — if it cannot see the
-  complete state, it cannot act correctly
+- Considera solo la **percepción actual**. Sin memoria.
+- Opera mediante **reglas de condición y acción**
+- ✅ Implementación simple y eficiente
+- ❌ **Falla en entornos parcialmente observables**: si no puede ver el
+  estado completo, no puede actuar correctamente
 
-Works only when the current percept contains all relevant information.
+Solo funciona cuando la percepción actual contiene toda la información relevante.
 
 ---
 
-# 2 · Model-based reflex agent
+# 2 · Agente reactivo basado en modelos
 
 ![bg right:30%](images/slide15-1.png)
 
-Maintains an **internal state** using two models:
+Mantiene un **estado interno** mediante dos modelos:
 
-- **World model** — how the environment evolves independently of the agent
-- **Transition model** — how the agent's own actions affect the environment
+- **Modelo del mundo** — cómo evoluciona el entorno independientemente del agente
+- **Modelo de transición** — cómo afectan al entorno las acciones del propio agente
 
-Updates internal state each step, then applies condition–action rules **to that
-state**.
+Actualiza el estado interno en cada paso y luego aplica reglas de condición y acción **a ese
+estado**.
 
-Can now act coherently **without observing the complete environment**.
+Ahora puede actuar de forma coherente **sin observar el entorno completo**.
 
 ---
 
-# 3 · Goal-based agent
+# 3 · Agente basado en objetivos
 
 ![bg right:30%](images/slide16-1.png)
 
-Knowing where you *are* is not enough — you also need to know where you **want to
-go**.
+Saber dónde *estás* no es suficiente: también necesitas saber adónde **quieres
+ir**.
 
-- **Goals** describe desired states of the world
-- The agent chooses actions that move it toward the goal → this requires
-  **planning and search**
-- ✅ Adapts when the goal changes
-- ❌ Goals are **binary**: cannot distinguish a better path from a worse one
+- Los **objetivos** describen estados deseados del mundo
+- El agente elige acciones que lo acercan al objetivo; esto requiere
+  **planificación y búsqueda**
+- ✅ Se adapta cuando cambia el objetivo
+- ❌ Los objetivos son **binarios**: no distinguen un camino mejor de uno peor
 
 ---
 
-# 4 · Utility-based agent
+# 4 · Agente basado en utilidad
 
 ![bg right:30%](images/slide17-1.png)
 
-Distinguishes among solutions of **different quality**. Chooses the action that
-maximizes **expected utility**, weighting outcomes by probability.
+Distingue entre soluciones de **diferente calidad**. Elige la acción que
+maximiza la **utilidad esperada**, ponderando los resultados por su probabilidad.
 
-Handles:
+Maneja:
 
-- **Conflicting objectives** — speed vs. safety in a taxi
-- **Uncertainty** — acting when the outcome is not guaranteed
+- **Objetivos en conflicto** — rapidez frente a seguridad en un taxi
+- **Incertidumbre** — actuar cuando el resultado no está garantizado
 
-Only utility lets you make a trade-off. Goals cannot.
+Solo la utilidad permite equilibrar criterios. Los objetivos no.
 
 <!--
-5 min for all four. Emphasize the last step hardest — the studio task turns on
-it: their utility agent will leave a room dirty because cleaning costs more than
-the remaining reward, and they will report it as a bug.
+5 min para las cuatro arquitecturas. Enfatiza especialmente el último paso: la tarea del taller depende de
+él. Su agente basado en utilidad dejará una habitación sucia porque limpiarla cuesta más que
+la recompensa restante, y lo reportarán como un error.
 -->
 
 ---
 
-# How much structure does a state have?
+# ¿Cuánta estructura tiene un estado?
 
 ![bg right:32%](images/slide18-1.png)
 
-| Representation | A state is… |
+| Representación | Un estado es… |
 |---|---|
-| **Atomic** | an indivisible black box, no internal structure |
-| **Factored** | a set of variables/attributes with values |
-| **Structured** | objects and the relationships among them |
+| **Atómica** | una caja negra indivisible, sin estructura interna |
+| **Factorizada** | un conjunto de variables o atributos con valores |
+| **Estructurada** | objetos y las relaciones entre ellos |
 
-**Why does the level matter?**
+**¿Por qué importa el nivel?**
 
-Greater expressiveness enables more reasoning — and increases computational
-complexity.
+Una mayor expresividad permite más razonamiento y aumenta la complejidad
+computacional.
 
-*Atomic → weeks 3–5. Factored → week 6. Structured → weeks 8–9.*
+*Atómica → semanas 3–5. Factorizada → semana 6. Estructurada → semanas 8–9.*
 
 ---
 
-# Next: live coding
+# A continuación: programación en vivo
 
-## Vacuum world, three agents, one interface
+## Mundo de la aspiradora, tres agentes, una interfaz
 
-Then we **break the location sensor** in four lines and watch the reflex agent
-become unable to act.
+Después **hacemos fallar el sensor de ubicación** en cuatro líneas y observamos cómo el agente reactivo
+se vuelve incapaz de actuar.
 
-**Studio:** you will plug an LLM into the same `percept → action` socket and
-count how many lines of defensive code it needs that the classical agents did not.
+**Taller:** conectarás un LLM a la misma interfaz `percept → action` y
+contarás cuántas líneas de código defensivo necesita que los agentes clásicos no necesitaban.
 
 <!--
-Code is in ../../weeks/week-02.md. The sensor break is the beat that earns the
-model-based agent; do not skip straight to the fix.
+El código está en ../../weeks/week-02.md. El fallo del sensor es lo que justifica
+el agente basado en modelos; no pases directamente a la solución.
 -->

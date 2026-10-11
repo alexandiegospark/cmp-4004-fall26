@@ -1,74 +1,89 @@
-"""Week 2 studio — Task 1 starter (complete the agent taxonomy).
+"""Taller de la semana 2 — Plantilla de la tarea 1: completa la clasificación de agentes.
 
-Fill in the two agents below, then run ``python3 test_agents.py``. All required
-tests must pass, INCLUDING the ones that assert a *surprising* property:
+Implementa los dos agentes y ejecuta ``python3 test_agents.py``. Todas las pruebas
+requeridas deben pasar, INCLUIDAS las que comprueban una propiedad sorprendente:
 
-  - the simple reflex agent PROVABLY fails on a world the model-based agent
-    handles (partial observability) — watch a guarantee fail;
-  - the utility agent RATIONALLY leaves a room dirty on at least one config —
-    not a bug, but specification-following under a cost model.
+  - el agente reactivo simple falla de manera DEMOSTRABLE en un mundo que maneja
+    el basado en modelos, con observabilidad parcial: observa el fallo de una garantía;
+  - el agente de utilidad deja RACIONALMENTE una habitación sucia en al menos
+    una configuración: sigue la especificación bajo un modelo de costo.
 
-You are given the world and two agents in ``vacuum.py`` (simple_reflex,
-model_based). You write ``goal_based`` and ``utility_based`` here.
+El entorno y los agentes simple_reflex y model_based se proporcionan en
+``vacuum.py``. Aquí escribes ``goal_based`` y ``utility_based``.
 """
+# Los agentes se implementan con funciones. El entorno VacuumWorld sí usa una clase.
+# Una fábrica devolverá una función interna con acceso a su memoria (clausura).
 from vacuum import VacuumWorld, run, simple_reflex, model_based
 
 
-# ---- Task 1: complete the taxonomy ------------------------------------------
+# ---- Tarea 1: completa la clasificación de agentes --------------------------
 
 def goal_based(goal=(False, False)):
-    """Return an agent that PLANS toward an explicit goal, then STOPS.
+    """Devuelve un agente que PLANIFICA hacia un objetivo explícito y después SE DETIENE.
 
-    The goal is a target dirt-state; ``(False, False)`` means "both rooms
-    clean". Unlike the reflex agent (which oscillates forever) the goal-based
-    agent must recognise the goal is reached and return ``"NoOp"`` from then on.
+    El objetivo es un estado de suciedad: ``(False, False)`` significa ambas
+    habitaciones limpias. A diferencia del reactivo, que oscila sin fin, debe
+    reconocer que alcanzó el objetivo y devolver ``"NoOp"`` desde entonces.
 
-    Suggested internal state (like model_based): remember which rooms you have
-    cleaned and where you are, since the percept only shows the current room.
+    Estado interno sugerido, como en model_based: recordar qué habitaciones
+    limpió y dónde está, pues la percepción solo muestra la habitación actual.
 
-    Returns: a function ``agent(percept) -> action``.
+    Devuelve una función ``agent(percept) -> action``.
     """
-    # TODO: build an agent with internal state that:
-    #   - reads `loc` from the percept (the sensor WORKS here — unlike the given
-    #     model_based, which assumes loc=0 and so only survives a broken sensor
-    #     when that belief happens to be right),
-    #   - Sucks when the current room is dirty (and records it clean),
-    #   - moves toward an as-yet-uncleaned room otherwise,
-    #   - returns "NoOp" once its record matches `goal` (all rooms clean).
+    # TODO significa tarea pendiente; el comentario no se ejecuta ni modifica el comportamiento.
+    # Una lista o diccionario creado aquí puede guardar memoria para la función interna.
+    # Cada llamada a la fábrica debe crear memoria nueva para evitar mezclar episodios.
+    # TODO: construye un agente con estado interno que:
+    #   - lea `loc` de la percepción: aquí el sensor FUNCIONA, a diferencia de
+    #     model_based, que supone loc=0 y solo funciona con el sensor averiado
+    #     cuando esa creencia resulta correcta;
+    #   - devuelva Suck si la habitación está sucia y la registre como limpia;
+    #   - se desplace hacia una habitación aún no limpiada en caso contrario;
+    #   - devuelva "NoOp" cuando su registro cumpla `goal`: ambas habitaciones limpias.
+    # Esta instrucción sí se ejecuta: marca el ejercicio pendiente. Sustitúyela al implementar el agente.
     raise NotImplementedError
 
 
 def utility_based(move_cost=1, suck_cost=2, clean_reward=3):
-    """Return an agent that maximises NET utility one step at a time.
+    """Devuelve un agente que maximiza la utilidad NETA paso a paso.
 
-    Cost model (same numbers as ``tournament.py``): each move costs
-    ``move_cost``, each Suck costs ``suck_cost``, and each clean room earns
-    ``clean_reward`` per step. The agent function only sees ``percept`` — it has
-    no lookahead — so it must reason *greedily* about the immediate net change.
+    Modelo de costo, con los valores de ``tournament.py``: moverse cuesta
+    ``move_cost``, cada Suck cuesta ``suck_cost`` y cada habitación limpia
+    aporta ``clean_reward`` por paso. Solo ve ``percept``: no anticipa pasos
+    futuros y debe razonar de forma voraz sobre el cambio neto inmediato.
 
-    The intended discovery: a greedy utility agent SOMETIMES LEAVES A ROOM
-    DIRTY, because paying to travel to a room it cannot see the payoff of is not
-    immediately worth it. Report it as a result, not a bug — this is the first
-    time an agent makes a decision you did not intend but cannot argue with.
+    El descubrimiento esperado: A VECES DEJA UNA HABITACIÓN SUCIA porque pagar
+    por viajar hacia un beneficio que no ve no compensa de inmediato. Repórtalo
+    como resultado, no como error: es la primera vez que un agente toma una
+    decisión que no deseabas, pero que sigue el criterio que le diste.
 
-    Returns: a function ``agent(percept) -> action``.
+    Devuelve una función ``agent(percept) -> action``.
     """
-    # TODO: build an agent with internal state that:
-    #   - reads `loc` from the percept (the sensor works here),
-    #   - Sucks the current room when dirty (a clean room repays suck_cost fast),
-    #   - otherwise weighs the immediate cost of crossing against the immediate
-    #     reward of doing so, and returns "NoOp" when crossing does not pay off.
+    # TODO significa tarea pendiente; el comentario no se ejecuta ni modifica el comportamiento.
+    # Una lista o diccionario creado aquí puede guardar memoria para la función interna.
+    # Cada llamada a la fábrica debe crear memoria nueva para evitar mezclar episodios.
+    # TODO: construye un agente con estado interno que:
+    #   - lea `loc` de la percepción: aquí el sensor funciona;
+    #   - limpie con Suck la habitación actual si está sucia: recupera pronto suck_cost;
+    #   - en caso contrario, compare el costo inmediato de desplazarse con la recompensa
+    #     inmediata, y devuelva "NoOp" cuando desplazarse no compense.
+    # Esta instrucción sí se ejecuta: marca el ejercicio pendiente. Sustitúyela al implementar el agente.
     raise NotImplementedError
 
 
-# ---- Task 2 sketch (the LLM as agent function) ------------------------------
-# See README.md §"Task 2". Drop a language model into the SAME percept->action
-# socket. You supply the model call; you must handle malformed output and LOG
-# every parse failure (it belongs on the scorecard — axis 8).
+# ---- Esquema de la tarea 2: el LLM como función del agente -------------------
+# Consulta README.md, sección «Tarea 2». Conecta el modelo a la MISMA interfaz percept->action.
+# Tú proporcionas la llamada; debes manejar las salidas mal formadas y REGISTRAR
+# cada fallo de análisis: corresponde al eje 8 de la ficha de evaluación.
 #
 from aicourse.llm import LLM
-model = LLM()  # your configured local backend
+# POO: LLM es una clase; model es una instancia creada mediante su inicializador.
+# Este objeto reúne la configuración y los métodos de acceso al modelo de lenguaje.
+# La creación está a nivel de módulo: también ocurre al importar starter, no solo al ejecutarlo.
+model = LLM()  # el backend local que hayas configurado
 #
+# El prompt se conserva en inglés: las palabras de acción y sus campos forman la interfaz experimental.
+# {history}, {loc} y {status} son campos que se completan con str.format, sin cambiar sus nombres.
 PROMPT = """You control a vacuum robot in a 2-room world.
 Rooms 0 and 1. Each is Clean or Dirty.
 Actions: Left, Right, Suck, NoOp.
@@ -77,30 +92,46 @@ History of (percept, action) so far:
 Current percept: location={loc}, status={status}
 Reply with exactly one action word and nothing else."""
 
+# Convierte la respuesta libre del modelo en una de las cuatro cadenas válidas para el entorno.
+# No es un método de clase: es una función auxiliar que devuelve una acción o None.
 def parse_action(raw):
     actions = ["Left", "Right", "Suck", "NoOp"]
 
+    # strip() es un método de str: devuelve otra cadena sin espacios exteriores.
     text = raw.strip()
 
+    # El orden importa: devuelve la primera acción cuya palabra aparezca como subcadena.
+    # lower() compara sin distinguir mayúsculas. También acepta «Suck.» o «I would suck».
+    # Si la respuesta menciona varias acciones o una negación, este analizador no interpreta su sentido.
     for action in actions:
         if action.lower() in text.lower():
             return action
 
+    # Conserva la respuesta original en la salida para poder documentar el fallo de análisis.
     print("PARSE FAILURE:", raw)
     return None
 
 
+# history es una lista de pares (percepción, acción); convierte cada par en una línea de texto.
 def fmt(history):
+    # join() es un método de str; une las líneas generadas con saltos de línea.
     return "\n".join(
         f"{percept} -> {action}"
         for percept, action in history
     )
 
 
+# Fábrica de una política con clausura: la función interna recuerda la lista history recibida.
+# La lista no se copia: el llamador y este agente comparten el mismo objeto mutable.
+# Usa una lista distinta para cada episodio si quieres separar sus historiales.
 def llm_agent(history):
+    # Cada llamada decide una acción a partir de la percepción actual y del historial acumulado.
     def agent(percept):
+        # Desempaqueta la tupla; dirty=True se comunica al modelo como Dirty.
         loc, dirty = percept
 
+        # Invoca complete(), método de la instancia model, con el prompt ya rellenado.
+        # PROMPT.format() es otro método, esta vez del objeto cadena que contiene la plantilla.
         resp = model.complete(
             PROMPT.format(
                 history=fmt(history),
@@ -109,35 +140,42 @@ def llm_agent(history):
             )
         )
 
+        # resp es el objeto resultado; .text accede al atributo que guarda su respuesta textual.
         action = parse_action(resp.text)
 
+        # Si no se pudo analizar, adopta NoOp como acción por defecto. Aquí no hay reintento.
         if action is None:
             action = "NoOp"
 
+        # append() es un método de list: modifica el historial compartido añadiendo este paso.
         history.append((percept, action))
 
         return action
 
+    # Devuelve el objeto función; no hace una llamada al LLM hasta recibir una percepción.
     return agent
 
 
 
-# Run the same 8 configs; run ONE config 5x and count distinct action sequences
-# (reproducibility — axis 5, made visceral). Compare to the four classical agents.
+# Ejecuta las mismas 8 configuraciones; repite UNA 5 veces y cuenta las secuencias distintas.
+# Es una comprobación directa de reproducibilidad, eje 5. Compara con los cuatro agentes clásicos.
 
 
+# Este bloque de demostración se ejecuta al lanzar el archivo, no al importarlo.
 if __name__ == "__main__":
-    # Quick smoke test: run each agent you've filled in on one config.
+    # Prueba básica: ejecuta cada agente que hayas completado sobre una configuración.
     from tournament import tournament, net_utility
 
+    # Guarda fábricas de cero argumentos. lambda devuelve el reactivo, que no necesita memoria nueva.
     factories = {
         "reflex": lambda: simple_reflex,
         "model": model_based,
     }
     for name, make in [("goal", goal_based), ("utility", utility_based)]:
         try:
-            make()  # will raise NotImplementedError until you fill it in
+            make()  # lanza NotImplementedError hasta que lo completes
             factories[name] = make
+        # Captura el ejercicio aún pendiente y continúa la demostración con lo disponible.
         except NotImplementedError:
             print(f"  {name:<10} not implemented yet")
 

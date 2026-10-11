@@ -2,253 +2,253 @@
 marp: true
 theme: default
 paginate: true
-header: 'CMP-4004 · Week 3 · Problem Formulation & Uninformed Search'
+header: 'CMP-4004 · Semana 3 · Formulación de problemas y búsqueda no informada'
 ---
 
 <!--
-Week 3 Session A. Mini-lecture budget: 25 minutes.
-Source: 02_Problem.pptx slides 1-10. Beats per lesson plan:
-formulation (8) → graph vs. tree (7) → criteria (5) → algorithms (5).
-Lesson plan: ../../weeks/week-03.md
+Semana 3, sesión A. Tiempo para la miniclase: 25 minutos.
+Fuente: 02_Problem.pptx, diapositivas 1-10. Etapas según el plan de clase:
+formulación (8) → grafo frente a árbol (7) → criterios (5) → algoritmos (5).
+Plan de clase: ../../weeks/week-03.md
 -->
 
-# Problem Solving
+# Resolución de problemas
 
-## Formulation, state spaces, and blind search
+## Formulación, espacios de estados y búsqueda ciega
 
-**CMP-4004** · Week 3
+**CMP-4004** · Semana 3
 
 ![bg right:35%](images/slide01-1.jpeg)
 
 ---
 
-# Problem-solving agents
+# Agentes que resuelven problemas
 
 ![bg right:38%](images/slide02-1.png)
 
-A **goal-based agent** that plans a sequence of actions to achieve its objective.
+Un **agente basado en objetivos** que planifica una secuencia de acciones para lograr su objetivo.
 
-It runs in **search-then-execute** mode:
+Opera en modo **buscar y después ejecutar**:
 
-1. **Formulate** the problem — *what exactly is the problem?*
-2. **Search** for a sequence of actions reaching the goal — *what is the best way?*
-3. **Execute** the resulting plan
+1. **Formular** el problema — *¿cuál es exactamente el problema?*
+2. **Buscar** una secuencia de acciones que alcance el objetivo — *¿cuál es la mejor forma?*
+3. **Ejecutar** el plan resultante
 
-Assumes an **observable, deterministic, discrete, static** environment.
+Supone un entorno **observable, determinista, discreto y estático**.
 
-> The solution is always a **sequence** of actions, not a single action.
+> La solución siempre es una **secuencia** de acciones, no una única acción.
 
 <!--
-Connect back to week 2 explicitly: this is the goal-based agent from the
-taxonomy, and those four assumptions are four of the six axes pinned to their
-easy case. Every later week relaxes one of them.
+Conecta explícitamente con la semana 2: este es el agente basado en objetivos de la
+clasificación, y esas cuatro suposiciones corresponden a cuatro de los seis ejes fijados en su
+caso sencillo. Cada semana posterior relaja una de ellas.
 -->
 
 ---
 
-# Problem formulation — five components
+# Formulación del problema: cinco componentes
 
 ![bg right:32%](images/slide03-1.jpeg)
 
-| Component | Definition |
+| Componente | Definición |
 |---|---|
-| **Initial state** | The state the agent starts from |
-| **Actions** | The set of actions available in each state |
-| **Transition model** | The result of applying an action: `Result(s, a) → s'` |
-| **Goal test** | A condition determining whether a state is the goal |
-| **Cost function** | Numerical cost of each action; **defines solution quality** |
+| **Estado inicial** | El estado del que parte el agente |
+| **Acciones** | El conjunto de acciones disponibles en cada estado |
+| **Modelo de transición** | El resultado de aplicar una acción: `Result(s, a) → s'` |
+| **Prueba de objetivo** | Una condición que determina si un estado es el objetivo |
+| **Función de costo** | Costo numérico de cada acción; **define la calidad de la solución** |
 
-Together these define the **state space**.
+Juntos definen el **espacio de estados**.
 
 ---
 
-# Formulation is a design decision
+# La formulación es una decisión de diseño
 
-## The 8-puzzle, two ways
+## El rompecabezas de 8 fichas, de dos maneras
 
-| | "Move the tile" | "Move the blank" |
+| | «Mover la ficha» | «Mover el espacio vacío» |
 |---|---|---|
-| Actions | 4 directions × 8 tiles | up/down/left/right on one blank |
-| Branching factor | up to 32 nominal | **2–4** |
-| Same puzzle? | yes | yes |
-| Same search cost? | **no — wildly different** | |
+| Acciones | 4 direcciones × 8 fichas | arriba/abajo/izquierda/derecha sobre un espacio vacío |
+| Factor de ramificación | hasta 32 nominales | **2–4** |
+| ¿Mismo rompecabezas? | sí | sí |
+| ¿Mismo costo de búsqueda? | **no: muy diferente** | |
 
-> **Half of applied AI is choosing a good representation before you write any
-> algorithm.**
+> **La mitad de la IA aplicada consiste en elegir una buena representación antes de escribir cualquier
+> algoritmo.**
 
 <!--
-8 min for formulation including this slide. Do the 8-puzzle and route-finding
-side by side, then this comparison. This is the slide that earns Task 1 of the
-studio, where students formulate missionaries-and-cannibals and disagree about
-where to enforce constraints.
+8 min para la formulación, incluida esta diapositiva. Trabaja el rompecabezas de 8 fichas y la búsqueda de rutas
+en paralelo; después haz esta comparación. Esta diapositiva justifica la tarea 1 del
+taller, donde los estudiantes formulan el problema de misioneros y caníbales y discrepan sobre
+dónde imponer las restricciones.
 -->
 
 ---
 
-# State space
+# Espacio de estados
 
 ![bg right:35%](images/slide04-1.png)
 
-The set of all states reachable from the initial state through **any** sequence
-of actions.
+El conjunto de todos los estados alcanzables desde el estado inicial mediante **cualquier** secuencia
+de acciones.
 
-Represented as a **graph**:
+Se representa como un **grafo**:
 
-- **Nodes** are states of the world
-- **Edges** are actions that transition between states
-- Each edge has an associated **cost**
+- Los **nodos** son estados del mundo
+- Las **aristas** son acciones que permiten transitar entre estados
+- Cada arista tiene un **costo** asociado
 
-**It is never built explicitly** — in practice it is far too large. The agent
-explores it progressively during the search.
+**Nunca se construye explícitamente**: en la práctica es demasiado grande. El agente
+lo explora progresivamente durante la búsqueda.
 
 ---
 
-# State *graph* vs. search *tree*
+# *Grafo* de estados frente a *árbol* de búsqueda
 
 ![bg right:40%](images/slide05-1.png)
 
-| **State graph** | **Search tree** |
+| **Grafo de estados** | **Árbol de búsqueda** |
 |---|---|
-| Represents the **problem** | Represents the **search process** |
-| Each state appears **once** | The same state may appear **many times**, once per path reaching it |
-| Finite (if the space is finite) | **Can be infinite even when the graph is finite** |
+| Representa el **problema** | Representa el **proceso de búsqueda** |
+| Cada estado aparece **una vez** | El mismo estado puede aparecer **muchas veces**, una por cada camino que llega a él |
+| Finito (si el espacio es finito) | **Puede ser infinito incluso si el grafo es finito** |
 
-A graph with a cycle produces an infinite tree. Expanding it three levels by hand
-makes this obvious in a way the sentence does not.
+Un grafo con un ciclo produce un árbol infinito. Expandirlo tres niveles a mano
+lo hace evidente de una forma que la oración por sí sola no logra.
 
 ---
 
-# Repeated states will not terminate on their own
+# Los estados repetidos no se detienen por sí solos
 
 ![bg right:35%](images/slide05-2.png)
 
-When the search tree is expanded, the same state may be generated through
-multiple paths — causing **infinite cycles** if uncontrolled.
+Al expandir el árbol de búsqueda, el mismo estado puede generarse por
+múltiples caminos, lo que causa **ciclos infinitos** si no se controla.
 
-**Solution: maintain two structures.**
+**Solución: mantener dos estructuras.**
 
-- **Frontier** — states generated but not yet explored
-- **Explored set** — states already expanded, never generated again
+- **Frontera** — estados generados, pero aún no explorados
+- **Conjunto de explorados** — estados ya expandidos que no vuelven a generarse
 
-Without repeated-state control, the algorithm **may not terminate even when a
-solution exists.** With control, each state is explored at most once.
+Sin control de estados repetidos, el algoritmo **puede no terminar aunque exista una
+solución.** Con control, cada estado se explora como máximo una vez.
 
 <!--
-7 min for the graph/tree pair. Walk an actual cycle on the board. Do not let it
-stay abstract — the corresponding pytest is
-test_dfs_terminates_on_cyclic_graph and it fails for real when they skip this.
+7 min para las diapositivas de grafo y árbol. Recorre un ciclo real en la pizarra. No dejes que
+quede como algo abstracto: la prueba correspondiente de pytest es
+test_dfs_terminates_on_cyclic_graph y falla realmente cuando omiten este control.
 -->
 
 ---
 
-# Uninformed search
+# Búsqueda no informada
 
 ![bg right:32%](images/slide06-1.png)
 
-**Blind** search: the agent has **no** information about which states are more
-promising.
+Búsqueda **ciega**: el agente **no** tiene información sobre qué estados son más
+prometedores.
 
-It knows only:
+Solo conoce:
 
-- the initial state
-- the available actions
-- the goal test
+- el estado inicial
+- las acciones disponibles
+- la prueba de objetivo
 
-It explores the space **systematically**, favoring no path. Algorithms differ
-*only* in the **order in which they expand nodes**.
+Explora el espacio **sistemáticamente**, sin favorecer ningún camino. Los algoritmos difieren
+*solo* en el **orden en que expanden los nodos**.
 
 ---
 
-# Four evaluation criteria
+# Cuatro criterios de evaluación
 
-| Criterion | The question | The trap |
+| Criterio | La pregunta | La trampa |
 |---|---|---|
-| **Completeness** | Guaranteed to find a solution if one exists? | "if one exists" |
-| **Optimality** | Guaranteed to find the **lowest-cost** solution? | almost always **conditional** |
-| **Time complexity** | How long does it take? | measured in **expansions**, not seconds |
-| **Space complexity** | How much memory does it require? | usually the binding constraint |
+| **Completitud** | ¿Garantiza encontrar una solución si existe? | «si existe» |
+| **Optimalidad** | ¿Garantiza encontrar la solución de **menor costo**? | casi siempre es **condicional** |
+| **Complejidad temporal** | ¿Cuánto tarda? | se mide en **expansiones**, no en segundos |
+| **Complejidad espacial** | ¿Cuánta memoria requiere? | suele ser la restricción limitante |
 
-### Say it precisely
+### Dilo con precisión
 
-BFS is optimal **when step costs are uniform** — *not* in general.
+BFS es óptima **cuando los costos de cada paso son uniformes**, *no* en general.
 
 <!--
-5 min. Drill the conditional. Checkpoint 1 asks students to state what a
-technique guarantees AND under what condition; an unqualified "BFS is optimal"
-scores zero, and they should hear that now.
+5 min. Insiste en la condición. El punto de control 1 pide que los estudiantes indiquen qué
+garantiza una técnica Y bajo qué condición; afirmar «BFS es óptima» sin precisar la condición
+obtiene cero puntos, y deben escucharlo ahora.
 -->
 
 ---
 
-# Breadth-first search
+# Búsqueda en anchura
 
 ![bg right:38%](images/slide07-1.png)
 
-Expands the **shallowest** nodes first, level by level.
-**Frontier: FIFO queue.**
+Expande primero los nodos **menos profundos**, nivel por nivel.
+**Frontera: cola FIFO.**
 
-- **Complete** — always finds a solution if one exists
-- **Optimal** — fewest steps, *when costs are uniform*
-- Time: **O(bᵈ)**
-- Space: **O(bᵈ)** ← the frontier grows exponentially with depth
+- **Completa** — siempre encuentra una solución si existe
+- **Óptima** — menor número de pasos, *cuando los costos son uniformes*
+- Tiempo: **O(bᵈ)**
+- Espacio: **O(bᵈ)** ← la frontera crece exponencialmente con la profundidad
 
-Memory, not time, is what kills BFS.
+La memoria, no el tiempo, es lo que hace inviable BFS.
 
 ---
 
-# Depth-first search
+# Búsqueda en profundidad
 
 ![bg right:38%](images/slide09-1.png)
 
-Expands the **deepest** nodes first, following one branch to the end.
-**Frontier: LIFO stack.**
+Expande primero los nodos **más profundos**, siguiendo una rama hasta el final.
+**Frontera: pila LIFO.**
 
-- **Complete** — *only* when repeated states are controlled and the space is finite
-- **Not optimal** — no guarantee of the shortest path
-- Time: **O(bᵐ)**
-- Space: **O(b·m)** ← the reason anyone uses it
+- **Completa** — *solo* si se controlan los estados repetidos y el espacio es finito
+- **No es óptima** — no garantiza el camino más corto
+- Tiempo: **O(bᵐ)**
+- Espacio: **O(b·m)** ← la razón por la que se utiliza
 
 ---
 
-# All four, in one table
+# Los cuatro algoritmos en una tabla
 
-| Algorithm | Frontier | Complete? | Optimal? | Time | Space |
+| Algoritmo | Frontera | ¿Completo? | ¿Óptimo? | Tiempo | Espacio |
 |---|---|---|---|---|---|
-| **BFS** | FIFO queue | Yes | uniform costs only | O(bᵈ) | **O(bᵈ)** |
-| **DFS** | LIFO stack | finite spaces w/ cycle control | No | O(bᵐ) | **O(bm)** |
-| **UCS** | priority queue on `g(n)` | Yes | **Yes** | O(b^(1+⌊C*/ε⌋)) | same |
-| **IDS** | LIFO, depth-limited | Yes | uniform costs only | O(bᵈ) | **O(bd)** |
+| **BFS** | cola FIFO | Sí | solo con costos uniformes | O(bᵈ) | **O(bᵈ)** |
+| **DFS** | pila LIFO | espacios finitos con control de ciclos | No | O(bᵐ) | **O(bm)** |
+| **UCS** | cola de prioridad según `g(n)` | Sí | **Sí** | O(b^(1+⌊C*/ε⌋)) | igual |
+| **IDS** | LIFO, profundidad limitada | Sí | solo con costos uniformes | O(bᵈ) | **O(bd)** |
 
-### The story
+### La idea central
 
-BFS has the guarantee but eats memory. DFS is cheap but has no guarantee.
-**IDS buys BFS's guarantee at DFS's memory cost — by re-doing work.**
+BFS tiene la garantía, pero consume memoria. DFS es económica, pero no tiene garantía.
+**IDS obtiene la garantía de BFS con el consumo de memoria de DFS, a cambio de repetir trabajo.**
 
-For b = 10, d = 5, the re-expansion overhead is about **11 %**. Cheap.
+Para b = 10, d = 5, el sobrecosto de volver a expandir es aproximadamente **11 %**. Bajo.
 
 <!--
-5 min. Compute the 11% on the board — it surprises people, and it is the
-justification for iterative deepening being the default in game search (week 5).
+5 min. Calcula el 11 % en la pizarra: sorprende a la gente y
+justifica que la profundización iterativa sea la opción habitual en la búsqueda para juegos (semana 5).
 -->
 
 ---
 
-# Next: live coding
+# A continuación: programación en vivo
 
-## One search function, four algorithms
+## Una función de búsqueda, cuatro algoritmos
 
-The only difference is the frontier data structure.
+La única diferencia es la estructura de datos de la frontera.
 
-**Two things we will get wrong on purpose first:**
+**Dos cosas que haremos mal deliberadamente al principio:**
 
-1. Goal test at **generation** instead of expansion → breaks UCS optimality.
-   We build the 3-node counterexample live.
-2. No expansion counter → nothing to compare. **Never write a search without a
-   counter.** It is scorecard axis 3.
+1. Aplicar la prueba de objetivo al **generar** en lugar de expandir → rompe la optimalidad de UCS.
+   Construimos en vivo el contraejemplo de 3 nodos.
+2. No contar las expansiones → nada que comparar. **Nunca escribas una búsqueda sin un
+   contador.** Corresponde al eje 3 de la ficha de evaluación.
 
 <!--
-Code is in ../../weeks/week-03.md. The generic search function is the most
-reused artifact in the course — weeks 4, 5, 6, and 9 all build on it.
-No LLM comparison this week, deliberately: you cannot evaluate a competitor
-until you can measure the incumbent. Say that in the debrief.
+El código está en ../../weeks/week-03.md. La función de búsqueda genérica es el
+recurso más reutilizado del curso: las semanas 4, 5, 6 y 9 se construyen sobre ella.
+Esta semana no habrá comparación con un LLM, deliberadamente: no puedes evaluar a un competidor
+hasta poder medir al sistema de referencia. Dilo en la puesta en común.
 -->

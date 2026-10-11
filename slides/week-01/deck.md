@@ -2,201 +2,201 @@
 marp: true
 theme: default
 paginate: true
-header: 'CMP-4004 · Week 1 · What Is Intelligence?'
+header: 'CMP-4004 · Semana 1 · ¿Qué es la inteligencia?'
 ---
 
 <!--
-Week 1 Session A. Mini-lecture budget: 25 minutes.
-Source: 01_Introduction to Artificial Intelligence.pptx (19 slides), reordered
-into a single chronological timeline. Lesson plan: ../../weeks/week-01.md
+Semana 1, sesión A. Tiempo para la miniclase: 25 minutos.
+Fuente: 01_Introduction to Artificial Intelligence.pptx (19 diapositivas), reorganizada
+en una única línea temporal cronológica. Plan de clase: ../../weeks/week-01.md
 -->
 
-# Artificial Intelligence
+# Inteligencia artificial
 
-## Classical Foundations, Modern Comparisons
+## Fundamentos clásicos, comparaciones modernas
 
-**CMP-4004** · Week 1
+**CMP-4004** · Semana 1
 
 
 ![bg right:35%](images/slide01-1.jpeg)
 
 ---
 
-# What do we mean by *intelligence*?
+# ¿Qué entendemos por *inteligencia*?
 
-- The ability to understand or comprehend
-- The ability to solve problems
-- Knowledge, comprehension, the act of understanding
-- The meaning assigned to a proposition or expression
-- Ability, skill, and experience
+- La capacidad de entender o comprender
+- La capacidad de resolver problemas
+- Conocimiento, comprensión, el acto de entender
+- El significado asignado a una proposición o expresión
+- Capacidad, habilidad y experiencia
 
-## And by *artificial* intelligence?
+## ¿Y por inteligencia *artificial*?
 
 <!--
-2 min. Do NOT resolve this. The warm-up poll has already been taken and the
-results are on screen. Point out that all five definitions are circular or
-contested — every one of them uses a word that needs the same explaining.
-This is exactly the problem Turing faced, which sets up the paper discussion.
+2 min. NO resuelvas esta cuestión. Ya se realizó la encuesta inicial y los
+resultados están en pantalla. Señala que las cinco definiciones son circulares o
+discutibles: todas usan una palabra que necesita la misma explicación.
+Este es exactamente el problema al que se enfrentó Turing y prepara la discusión del artículo.
 -->
 
 ---
 
-# The oldest ideas are older than you think
+# Las ideas más antiguas son más antiguas de lo que crees
 
 ![bg right:40%](images/slide19-1.png)
 
-**~800 BC** — the *Iliad* describes **Talos**: a bronze automaton guarding Crete
-from pirates and invaders.
+**~800 a. C.** — la *Ilíada* describe a **Talos**: un autómata de bronce que protege Creta
+de piratas e invasores.
 
-The idea of a made thing that acts on its own is not a computing idea. It is a
-mythological one, and it arrives ~2,700 years before the hardware.
+La idea de un objeto fabricado que actúa por sí solo no pertenece a la informática. Es una
+idea mitológica y aparece unos 2700 años antes del hardware.
 
 ---
 
-# ~200 BC — The Antikythera Mechanism
+# ~200 a. C. — El mecanismo de Anticitera
 
 ![bg right:45%](images/slide18-1.png)
 
-The earliest known **analog computer**. Predicts astronomical positions and
-eclipses up to 19 years ahead; also computes the dates of six Greek athletic
-competitions.
+La **computadora analógica** más antigua conocida. Predice posiciones astronómicas y
+eclipses con hasta 19 años de anticipación; también calcula las fechas de seis competiciones
+atléticas griegas.
 
-> This discovery fundamentally challenges the belief that human technological
-> development has always been incremental.
+> Este descubrimiento cuestiona de manera fundamental la creencia de que el desarrollo
+> tecnológico humano siempre ha sido gradual.
 
 <!--
-1 min. The recovery story is worth 20 seconds: divers found it in 1900;
-archaeologists dismissed a gear embedded in rock in 1902 because the mechanism
-"seemed too advanced for the period." Serious study only resumed 1951-1971.
-The lesson is about how experts handle evidence that contradicts their model —
-which is a lesson this course will use repeatedly.
+1 min. Dedica 20 segundos al hallazgo: unos buzos lo encontraron en 1900;
+en 1902 los arqueólogos descartaron un engranaje incrustado en roca porque el mecanismo
+«parecía demasiado avanzado para la época». El estudio riguroso solo se retomó entre 1951 y 1971.
+La lección trata de cómo los expertos manejan evidencia que contradice su modelo:
+una lección que este curso utilizará repetidamente.
 -->
 
 ---
 
-# 1770 — The Mechanical Turk
+# 1770 — El Turco mecánico
 
 ![bg right:40%](images/slide03-2.jpeg)
 
-Built by Wolfgang von Kempelen. Appeared to play chess at a high level against
-human opponents.
+Construido por Wolfgang von Kempelen. Parecía jugar al ajedrez a un alto nivel contra
+oponentes humanos.
 
-**There was a human hidden inside.**
+**Había un ser humano escondido dentro.**
 
-### Question for the room
+### Pregunta para la clase
 
-What is the modern equivalent?
+¿Cuál es el equivalente moderno?
 
 <!--
-2 min, and take the detour. Someone will say data labelers, RLHF annotators, or
-"AI" products with humans in the loop. That is the right answer. Amazon named a
-crowdwork platform after this machine, apparently on purpose.
-The Turk is the first AI fraud and it establishes the course's core distinction:
-the APPEARANCE of intelligence versus the mechanism.
-Also on this slide's era: the Jaquet-Droz automata (1768-1774) — the musician,
-the draughtsman, and the writer. Real mechanisms, no hidden human.
+2 min; permite este desvío. Alguien mencionará etiquetadores de datos, anotadores de RLHF o
+productos de «IA» con intervención humana. Esa es la respuesta correcta. Amazon dio a una
+plataforma de trabajo colaborativo el nombre de esta máquina, aparentemente de forma intencional.
+El Turco es el primer fraude de IA y establece la distinción central del curso:
+la APARIENCIA de inteligencia frente al mecanismo.
+También son de esta época los autómatas de Jaquet-Droz (1768-1774): la música,
+el dibujante y el escritor. Mecanismos reales, sin seres humanos escondidos.
 -->
 
 ---
 
-# 1936–1945 — General-purpose computation
+# 1936–1945 — Computación de propósito general
 
 ![bg right:35%](images/slide04-1.png)
 
-**Z1** (1936, Konrad Zuse) — binary calculator, read operations from punched
-cards, floating-point arithmetic, storage memory.
+**Z1** (1936, Konrad Zuse) — calculadora binaria, leía operaciones de tarjetas
+perforadas, aritmética de punto flotante, memoria de almacenamiento.
 
-**ENIAC** (1945) — Electronic Numerical Integrator and Computer. Programmable,
-vacuum tubes, 170 m², 27 metric tons.
+**ENIAC** (1945) — Integrador Numérico Electrónico y Computadora. Programable,
+tubos de vacío, 170 m², 27 toneladas métricas.
 
-Now the substrate exists. Everything after this is about **what to compute**.
+Ahora existe el soporte físico. Todo lo que sigue trata de **qué calcular**.
 
 ---
 
-# 1950 — The Turing Test
+# 1950 — La prueba de Turing
 
 ![bg right:38%](images/slide05-1.png)
 
-Two humans and one computer. The interrogator is isolated and asks questions
-through a text terminal, then decides which respondent is the machine.
+Dos seres humanos y una computadora. El interrogador está aislado y hace preguntas
+mediante una terminal de texto; después decide cuál de los participantes es la máquina.
 
-If the interrogator cannot tell, **the machine is assumed intelligent**.
+Si el interrogador no puede distinguirlos, **se supone que la máquina es inteligente**.
 
-> An attempt to provide an *operational* and satisfactory definition of
-> intelligence.
+> Un intento de proporcionar una definición *operativa* y satisfactoria de
+> la inteligencia.
 
 <!--
-2 min. The word doing the work is "operational." Turing's move: replace an
-unanswerable question ("can machines think?") with a decidable one ("can they
-pass this test?"). That is the founding methodological move of the field, and it
-is the same move behind every benchmark students will run this semester.
-Connect forward: the paper discussion already covered §6's nine objections.
-Connect to the course: the benchmark turned out to be gameable. Hold that thought.
+2 min. La palabra clave es «operativa». La propuesta de Turing: sustituir una
+pregunta imposible de responder («¿pueden pensar las máquinas?») por una comprobable («¿pueden
+superar esta prueba?»). Ese es el paso metodológico fundacional del campo y es el
+mismo que está detrás de cada evaluación que los estudiantes realizarán este semestre.
+Conexión: la discusión del artículo ya cubrió las nueve objeciones de §6.
+Conexión con el curso: resultó posible manipular la evaluación. Conserva esa idea.
 -->
 
 ---
 
-# 1956 — Dartmouth: the field gets a name
+# 1956 — Dartmouth: el campo recibe un nombre
 
 ![bg right:33%](images/slide07-1.png)
 
-> "The study is to proceed on the basis of the conjecture that **every aspect of
-> learning or any other feature of intelligence can in principle be so precisely
-> described that a machine can be made to simulate it.**"
+> «El estudio se realizará sobre la base de la conjetura de que **cada aspecto del
+> aprendizaje o cualquier otra característica de la inteligencia puede, en principio, describirse
+> con tanta precisión que sea posible construir una máquina que lo simule.**»
 
 McCarthy · Minsky · Rochester · Shannon
 
-**The 1956 agenda:** automatic computers · programming a computer to use language ·
-neuron nets · theory of the size of a calculation · self-improvement ·
-abstractions · randomness and creativity
+**La agenda de 1956:** computadoras automáticas · programar una computadora para usar lenguaje ·
+redes neuronales · teoría del tamaño de un cálculo · mejora autónoma ·
+abstracciones · aleatoriedad y creatividad
 
 <!--
-2 min. Read the last sentence of the proposal out loud: "We think that a
-significant advance can be made... if a carefully selected group of scientists
-work on it together for a summer."
-Then ask how that estimate held up. The seven agenda items are still open
-research areas 70 years later. This is the field's founding document and its
-first schedule slip, and optimism about timelines is a permanent feature of AI.
+2 min. Lee en voz alta la última oración de la propuesta: «Creemos que se
+puede lograr un avance significativo... si un grupo de científicos cuidadosamente seleccionado
+trabaja en ello conjuntamente durante un verano».
+Después pregunta qué tan acertada fue esa estimación. Los siete puntos de la agenda siguen siendo
+áreas de investigación abiertas 70 años después. Este es el documento fundacional del campo y su
+primer retraso respecto al calendario; el optimismo sobre los plazos es una característica permanente de la IA.
 -->
 
 ---
 
-# 1957–1958 — Two languages, two philosophies
+# 1957–1958 — Dos lenguajes, dos filosofías
 
 ![bg right:30%](images/slide06-1.svg)
 
 | **FORTRAN** (1957, IBM) | **LISP** (1958, McCarthy) |
 |---|---|
-| Numerical computation | Symbolic computation |
-| **Imperative** | Based on **λ-calculus** and recursion |
-| Manages state (variables) | Dynamic types and functions |
-| Conditionals, loops | Main structure: the **list** |
-| | Prefix calls: `(f a1 a2 a3)` |
+| Computación numérica | Computación simbólica |
+| **Imperativo** | Basado en el **cálculo λ** y la recursión |
+| Gestiona el estado (variables) | Tipos dinámicos y funciones |
+| Condicionales, bucles | Estructura principal: la **lista** |
+| | Llamadas en notación prefija: `(f a1 a2 a3)` |
 
-Symbolic AI was written in LISP for thirty years because the language and the
-theory shared a shape.
+La IA simbólica se escribió en LISP durante treinta años porque el lenguaje y la
+teoría compartían una misma estructura.
 
 ---
 
-# 1958 — The Perceptron
+# 1958 — El perceptrón
 
 ![bg right:38%](images/slide08-1.png)
 
-A computational model inspired by biological neurons, proposed by
+Un modelo computacional inspirado en las neuronas biológicas, propuesto por
 **Frank Rosenblatt**.
 
-- A network of simple processing units that stores knowledge from experience
-- Knowledge is acquired from the environment through a **learning process**
-- Connections between units — **synaptic weights** — are where knowledge lives
+- Una red de unidades de procesamiento simples que almacena conocimiento a partir de la experiencia
+- El conocimiento se adquiere del entorno mediante un **proceso de aprendizaje**
+- Las conexiones entre unidades —los **pesos sinápticos**— son donde reside el conocimiento
 
-**The idea:** learn from data instead of being programmed.
+**La idea:** aprender de los datos en lugar de ser programado.
 
 <!--
-1 min here; the full treatment is week 14.
-CORRECTION TO STATE OUT LOUD: deck 07 of the original material calls him "Mark"
-Rosenblatt. It is FRANK Rosenblatt. The "Mark I Perceptron" was the machine —
-that is almost certainly where the error came from. Correct it openly; modeling
-how to handle an error in a source is part of what this slide teaches.
+1 min aquí; el tratamiento completo corresponde a la semana 14.
+CORRECCIÓN QUE DEBES DECIR EN VOZ ALTA: la presentación 07 del material original lo llama «Mark»
+Rosenblatt. Es FRANK Rosenblatt. «Mark I Perceptron» era el nombre de la máquina:
+casi con certeza ese es el origen del error. Corrígelo abiertamente; mostrar
+cómo manejar un error en una fuente es parte de lo que enseña esta diapositiva.
 -->
 
 ---
@@ -205,167 +205,167 @@ how to handle an error in a source is part of what this slide teaches.
 
 ![bg right:30%](images/slide09-1.png)
 
-**Algorithm = Logic + Control**
+**Algoritmo = Lógica + Control**
 
-- A **declarative** logic-programming language
-- Programs are sets of clauses in a notation close to first-order logic
-- The programmer states what is *true*; the language does the searching
-- Many expert systems — legal, medical, financial — were written in it
+- Un lenguaje de programación lógica **declarativo**
+- Los programas son conjuntos de cláusulas con una notación cercana a la lógica de primer orden
+- El programador expresa lo que es *verdadero*; el lenguaje realiza la búsqueda
+- Muchos sistemas expertos —jurídicos, médicos y financieros— se escribieron en él
 
 <!--
-1 min. Full treatment in week 8.
-TWO CORRECTIONS to the original deck, and make them visibly:
-  1. It says "Created by Dennis Ritchie at Bell Labs." That is false. Prolog was
-     created by ALAIN COLMERAUER and PHILIPPE ROUSSEL in Marseille in 1972.
-     Ritchie created C — a reasonable thing to confuse only if you are not
-     looking closely.
-  2. It calls Prolog "an imperative, compiled language" two lines after
-     correctly describing logic programming. Prolog is declarative.
-Say plainly: I am correcting my own course material in front of you. Do this to
-my slides too when you find something wrong. That instruction is load-bearing
-for a course whose whole method is checking claims against evidence.
+1 min. Tratamiento completo en la semana 8.
+DOS CORRECCIONES a la presentación original; hazlas de forma visible:
+  1. Dice «Creado por Dennis Ritchie en Bell Labs». Es falso. Prolog fue
+     creado por ALAIN COLMERAUER y PHILIPPE ROUSSEL en Marsella en 1972.
+     Ritchie creó C: una confusión comprensible solo si no se
+     revisa con atención.
+  2. Describe Prolog como «un lenguaje imperativo y compilado» dos líneas después de
+     describir correctamente la programación lógica. Prolog es declarativo.
+Di claramente: estoy corrigiendo mi propio material del curso delante de ustedes. Hagan lo mismo con
+mis diapositivas cuando encuentren algo incorrecto. Esa instrucción es fundamental
+en un curso cuyo método consiste en comprobar afirmaciones frente a la evidencia.
 -->
 
 ---
 
-# What *is* a model?
+# ¿Qué *es* un modelo?
 
-- A description of a system or phenomenon in mathematical language
-- A **hypothesis** for explaining a phenomenon
-- Something we construct or assume, based on rules defined *a priori* or on
-  observations
+- Una descripción de un sistema o fenómeno en lenguaje matemático
+- Una **hipótesis** para explicar un fenómeno
+- Algo que construimos o suponemos a partir de reglas definidas *a priori* o de
+  observaciones
 
-## Two ways to build one
+## Dos formas de construir uno
 
-| **Formal methods** | **Statistical methods** |
+| **Métodos formales** | **Métodos estadísticos** |
 |---|---|
-| First-order logic | Regression |
-| λ-calculus | Classification |
-| Temporal logic | Bayesian networks |
-| Rewriting systems | Markov networks |
-| Causal calculus | |
+| Lógica de primer orden | Regresión |
+| Cálculo λ | Clasificación |
+| Lógica temporal | Redes bayesianas |
+| Sistemas de reescritura | Redes de Markov |
+| Cálculo causal | |
 
 <!--
-3 min. This is the most important slide in the deck. Say it explicitly:
-  the LEFT column is weeks 3-11. The RIGHT column is weeks 12-14.
-  The tension between them IS the course.
-Do not let this pass as a taxonomy. It is the syllabus.
+3 min. Esta es la diapositiva más importante de la presentación. Dilo explícitamente:
+  la columna IZQUIERDA corresponde a las semanas 3-11. La DERECHA, a las semanas 12-14.
+  La tensión entre ambas ES el curso.
+No dejes que se interprete como una simple taxonomía. Es el programa del curso.
 -->
 
 ---
 
-# 1975 / 1986 — Backpropagation
+# 1975 / 1986 — Retropropagación
 
 ![bg right:35%](images/slide11-1.png)
 
-Computes the gradient of the loss with respect to every weight in the network.
+Calcula el gradiente de la pérdida con respecto a cada peso de la red.
 
-Made it possible to train **units connected in series** — adding the nonlinearity
-that lets a network solve **XOR**.
+Permitió entrenar **unidades conectadas en serie**, añadiendo la no linealidad
+que permite a una red resolver **XOR**.
 
 <!--
-1 min; derived properly in week 14.
-CORRECTION: the deck dates this 1975, which is Werbos's thesis. The result that
-actually moved the field is Rumelhart, Hinton & Williams (1986). Both dates are
-worth naming, and the 11-year gap between "published" and "noticed" is itself a
-lesson about how ideas land in a field.
+1 min; se deriva rigurosamente en la semana 14.
+CORRECCIÓN: la presentación lo fecha en 1975, correspondiente a la tesis de Werbos. El resultado que
+realmente impulsó el campo es el de Rumelhart, Hinton y Williams (1986). Vale la pena
+mencionar ambas fechas; la diferencia de 11 años entre «publicado» y «reconocido» es, por sí misma,
+una lección sobre cómo se reciben las ideas en un campo.
 -->
 
 ---
 
-# 1995 — Support Vector Machines
+# 1995 — Máquinas de vectores de soporte
 
 ![bg right:35%](images/slide12-1.png)
 
-Vapnik and colleagues at AT&T Bell Labs: a linear classifier that **maximizes the
-margin** between two subspaces.
+Vapnik y sus colegas de AT&T Bell Labs: un clasificador lineal que **maximiza el
+margen** entre dos subespacios.
 
-Statistical learning theory arrives — generalization becomes something you can
-reason about rather than hope for.
+Llega la teoría del aprendizaje estadístico: la generalización se convierte en algo sobre lo que puedes
+razonar, en lugar de algo que solo esperas obtener.
 
 <!--
-30 seconds. Milestone only. We do not teach the kernel trick in this course;
-say so, and say why (it needs a session we do not have — see the coverage map).
+30 segundos. Solo como hito. No enseñamos el truco del kernel en este curso;
+dilo y explica por qué: requiere una sesión que no tenemos; consulta el mapa de cobertura.
 -->
 
 ---
 
-# 2000s — Deep learning
+# Años 2000 — Aprendizaje profundo
 
 ![bg right:35%](images/slide13-1.png)
 
-The theoretical tools existed from the 1960s; the term arrives in 1986. Bengio,
-Hinton, and LeCun establish the foundations for training networks whose **depth**
-can grow.
+Las herramientas teóricas existían desde los años sesenta; el término aparece en 1986. Bengio,
+Hinton y LeCun establecen las bases para entrenar redes cuya **profundidad**
+puede aumentar.
 
-What changed was not the idea. It was **data and compute**.
+Lo que cambió no fue la idea. Fueron **los datos y la capacidad de cómputo**.
 
 ---
 
-# The limits of statistical models
+# Los límites de los modelos estadísticos
 
 ![bg right:45%](images/slide15-1.png)
 
-Correlation is not intervention.
+La correlación no es intervención.
 
-**Judea Pearl's causal calculus (1987)** encodes cause-and-effect relations in a
-**directed acyclic graph**, letting you ask:
+**El cálculo causal de Judea Pearl (1987)** representa relaciones de causa y efecto en un
+**grafo dirigido acíclico**, lo que permite preguntar:
 
-- Is A the cause and B the effect?
-- Is B the cause and A the effect?
-- *(But not both at once.)*
+- ¿Es A la causa y B el efecto?
+- ¿Es B la causa y A el efecto?
+- *(Pero no ambas cosas a la vez.)*
 
-A model that predicts cannot necessarily tell you **what happens if you act**.
+Un modelo que predice no necesariamente puede decirte **qué ocurre si actúas**.
 
 <!--
-2 min. This is the best idea in the original deck and it is easy to skip.
-Keep it: it is the sharpest available statement of what a purely predictive
-system does not give you — and every LLM the class benchmarks this semester is a
-purely predictive system. Foreshadow week 12.
+2 min. Esta es la mejor idea de la presentación original y es fácil omitirla.
+Consérvala: es la formulación más clara disponible de lo que no proporciona un sistema puramente
+predictivo; y cada LLM que la clase evalúe este semestre es un
+sistema puramente predictivo. Anticipa la semana 12.
 -->
 
 ---
 
-# The timeline, in one table
+# La línea temporal en una tabla
 
-| Era | Milestone | What it made *possible* |
+| Época | Hito | Lo que hizo *posible* |
 |---|---|---|
-| ~800 BC | Talos (myth) | The idea of an autonomous made thing |
-| ~200 BC | Antikythera | Computation as a physical artifact |
-| 1770 | Mechanical Turk | The *appearance* of intelligence — and the first AI fraud |
-| 1936–45 | Z1, ENIAC | General-purpose programmable computation |
-| 1950 | Turing Test | Intelligence as something you can *test for* |
-| 1956 | Dartmouth | AI as a named discipline with an agenda |
-| 1957–58 | FORTRAN, LISP | Imperative vs. symbolic computation |
-| 1958 | Perceptron | Learning from data instead of being programmed |
-| 1972 | Prolog | Computation as logical deduction |
-| 1986 | Backprop (pub. 1975) | Depth → nonlinearity → XOR |
-| 1987→ | Causal calculus | Reasoning about interventions |
-| 1995 | SVM | Margin maximization; learning theory |
-| 2000s | Deep learning | Representation learning at scale |
+| ~800 a. C. | Talos (mito) | La idea de un objeto fabricado autónomo |
+| ~200 a. C. | Anticitera | La computación como artefacto físico |
+| 1770 | Turco mecánico | La *apariencia* de inteligencia y el primer fraude de IA |
+| 1936–45 | Z1, ENIAC | Computación programable de propósito general |
+| 1950 | Prueba de Turing | La inteligencia como algo que puedes *comprobar* |
+| 1956 | Dartmouth | La IA como disciplina con nombre y agenda |
+| 1957–58 | FORTRAN, LISP | Computación imperativa frente a simbólica |
+| 1958 | Perceptrón | Aprender de los datos en lugar de ser programado |
+| 1972 | Prolog | La computación como deducción lógica |
+| 1986 | Retropropagación (pub. 1975) | Profundidad → no linealidad → XOR |
+| 1987→ | Cálculo causal | Razonar sobre intervenciones |
+| 1995 | SVM | Maximización del margen; teoría del aprendizaje |
+| Años 2000 | Aprendizaje profundo | Aprendizaje de representaciones a gran escala |
 
 <!--
-Do not read this aloud. It is the reference slide students screenshot.
-Milestones are worth naming for what they UNLOCKED, not for their dates.
+No leas esto en voz alta. Es la diapositiva de referencia que los estudiantes capturan.
+Vale la pena mencionar los hitos por lo que HICIERON POSIBLE, no por sus fechas.
 -->
 
 ---
 
-# Next: live coding
+# A continuación: programación en vivo
 
-## We build ELIZA (1966) in 40 lines
+## Construimos ELIZA (1966) en 40 líneas
 
-Then we break it deliberately.
+Después la hacemos fallar deliberadamente.
 
-**The question we will end on:**
+**La pregunta con la que terminaremos:**
 
-> An LLM has no explicit model of the world either — it predicts tokens.
-> Is it ELIZA with more parameters, or is it categorically different?
+> Un LLM tampoco tiene un modelo explícito del mundo: predice tokens.
+> ¿Es ELIZA con más parámetros o es algo de una categoría diferente?
 >
-> *Write down your answer. We reopen it in week 14.*
+> *Escribe tu respuesta. Volveremos a abrirla en la semana 14.*
 
 <!--
-Live-coding code is in ../../weeks/week-01.md. Collect the sealed predictions —
-they are the best closing artifact available in week 14, and students lose them
-if you do not hold them yourself.
+El código para programar en vivo está en ../../weeks/week-01.md. Recoge las predicciones selladas:
+son el mejor entregable disponible para cerrar la semana 14; los estudiantes las pierden
+si no las conservas tú.
 -->

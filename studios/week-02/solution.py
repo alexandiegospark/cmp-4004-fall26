@@ -1,94 +1,118 @@
-"""Week 2 studio — REFERENCE SOLUTION (instructor-only).
+"""Taller de la semana 2 — SOLUCIÓN DE REFERENCIA (solo para el docente).
 
-A filled-in copy of ``starter.py``: identical function names and signatures, so
-the *provided* ``test_agents.py`` passes when this module is imported in place of
-``starter``. Verify with ``studios/_verify_solutions.py`` (which aliases this file
-to the name ``starter`` and runs the unmodified test).
+Versión completada de ``starter.py``: conserva los nombres y firmas de las
+funciones para que ``test_agents.py`` pase al importar este módulo como ``starter``.
+El material describe ``studios/_verify_solutions.py`` como verificador: registra
+este archivo con el nombre ``starter`` y ejecuta las pruebas sin modificarlas.
 
-DO NOT ship this to students — it is excluded via ``studios/.gitignore``. The
-teaching walkthrough lives in ``solution.ipynb`` (which imports this file rather
-than re-pasting it, so the two never drift).
+NO distribuir a estudiantes: se excluye mediante ``studios/.gitignore``.
+La explicación didáctica está en ``solution.ipynb``, que importa este archivo
+en lugar de copiarlo para mantener ambas versiones sincronizadas.
 """
+# Las políticas son funciones, no clases. Cada fábrica devuelve una función con memoria propia.
+# VacuumWorld sí es una clase; run y las demás políticas se importan para reutilizarlas.
 from vacuum import VacuumWorld, run, simple_reflex, model_based
 
 
-# ---- Task 1: complete the taxonomy ------------------------------------------
+# ---- Tarea 1: completa la clasificación de agentes --------------------------
 
 def goal_based(goal=(False, False)):
-    """Return an agent that PLANS toward an explicit goal, then STOPS.
+    """Devuelve un agente que PLANIFICA hacia un objetivo explícito y después SE DETIENE.
 
-    The goal is a target dirt-state; ``(False, False)`` means "both rooms
-    clean". Unlike the reflex agent (which oscillates forever) the goal-based
-    agent recognises the goal is reached and returns ``"NoOp"`` from then on.
+    El objetivo es un estado de suciedad: ``(False, False)`` significa ambas
+    habitaciones limpias. A diferencia del agente reactivo, que oscila sin fin,
+    este reconoce que alcanzó el objetivo y devuelve ``"NoOp"`` desde entonces.
 
-    Reference design: keep a per-room record of what we have driven to clean.
-    The percept exposes ``loc`` (the sensor WORKS in ``VacuumWorld``), so — unlike
-    the given ``model_based``, which never reads ``loc`` and only survives a
-    *broken* sensor because its hardcoded belief happens to be right — we read the
-    true location and never need to guess where we are.
+    Mantiene un registro por habitación de lo que observó o dejó limpio.
+    La percepción expone ``loc``, pues el sensor FUNCIONA en ``VacuumWorld``.
+    A diferencia de ``model_based``, que ignora ``loc`` y solo funciona con el
+    sensor averiado cuando su creencia inicial fija resulta correcta, este
+    agente lee la ubicación real y no necesita adivinar dónde está.
     """
+    # tuple convierte el objetivo en una secuencia inmutable: la política no lo modifica.
     goal = tuple(goal)
-    cleaned = [False, False]          # rooms we have observed/driven to clean
+    # Memoria privada por clausura: cada llamada a la fábrica crea una lista nueva.
+    # En cleaned, True significa «sabemos que está limpia», no «está sucia».
+    cleaned = [False, False]          # habitaciones observadas o dejadas limpias
 
+    # La función interna conserva acceso a las variables de su fábrica entre llamadas.
+    # No es un método: no recibe self ni pertenece a una clase de agente.
     def agent(percept):
+        # La percepción es una tupla; loc es el índice real y dirty describe esa habitación.
         loc, dirty = percept
         if dirty:
-            cleaned[loc] = True        # it will be clean right after this Suck
+            cleaned[loc] = True        # quedará limpia al ejecutar este Suck
             return "Suck"
-        cleaned[loc] = True            # current room is clean and we now know it
-        # A room satisfies the goal when goal[i] is False (must be clean) and we
-        # have cleaned it. Rooms still needing work:
+        cleaned[loc] = True            # ahora sabemos que la habitación actual está limpia
+        # Una habitación cumple el objetivo si goal[i] es False (debe estar limpia) y
+        # la hemos limpiado. Estas habitaciones aún necesitan trabajo:
+        # Comprensión de lista: selecciona índices que deben estar limpios y aún no están registrados.
+        # False en goal exige limpieza; un valor True no obliga a ensuciar una habitación.
         need = [i for i in range(2) if not goal[i] and not cleaned[i]]
         if not need:
-            return "NoOp"              # goal reached — stop (reflex never does)
+            return "NoOp"              # objetivo alcanzado: detenerse; el reactivo no lo hace
+        # Elige la primera habitación pendiente y devuelve una acción hacia ella.
         target = need[0]
-        return "Right" if target == 1 else "Left"   # move toward uncleaned room
+        return "Right" if target == 1 else "Left"   # desplazarse hacia una habitación aún no limpiada
 
+    # Devuelve la función, sin ejecutarla. El simulador la llamará con cada percepción.
     return agent
 
 
 def utility_based(move_cost=1, suck_cost=2, clean_reward=3):
-    """Return an agent that maximises NET utility one step at a time.
+    """Devuelve un agente que maximiza la utilidad NETA paso a paso.
 
-    Cost model (same numbers as ``tournament.py``): each move costs
-    ``move_cost``, each Suck costs ``suck_cost``, and each clean room earns
-    ``clean_reward`` per step. The agent function only sees ``percept`` — it has
-    no lookahead — so it reasons *greedily* about the immediate net change.
+    Modelo de costo, con los valores de ``tournament.py``: cada desplazamiento
+    cuesta ``move_cost``, cada Suck cuesta ``suck_cost`` y cada habitación
+    limpia aporta ``clean_reward`` por paso. La función solo ve ``percept``:
+    no anticipa pasos futuros y considera de forma voraz el cambio neto inmediato.
 
-    The intended discovery: this greedy agent SOMETIMES LEAVES A ROOM DIRTY. When
-    the current room is clean, the only move it can make crosses to a room it
-    cannot see. A crossing (Left/Right) does not clean anything on the step it
-    happens, so the number of clean rooms is unchanged that step; the immediate
-    net change of crossing is therefore ``-move_cost`` (a strict loss) versus
-    ``0`` for ``NoOp``. A horizon-free agent will not pay to travel toward a
-    payoff it cannot yet see — so it stops. Report it as a result, not a bug.
+    El descubrimiento esperado: A VECES DEJA UNA HABITACIÓN SUCIA. Cuando la
+    habitación actual está limpia, solo puede desplazarse a otra que no ve.
+    Left/Right no limpia nada en el paso del desplazamiento; la cantidad de
+    habitaciones limpias no cambia. El cambio neto inmediato de desplazarse es
+    ``-move_cost``, una pérdida estricta con los costos dados, frente a ``0``
+    para ``NoOp``. Sin horizonte futuro, no paga por viajar hacia un beneficio
+    que aún no puede ver: se detiene. Repórtalo como resultado, no como error.
     """
+    # Memoria privada por clausura: cada llamada a la fábrica crea una lista nueva.
+    # En cleaned, True significa «sabemos que está limpia», no «está sucia».
     cleaned = [False, False]
 
+    # La función interna conserva acceso a las variables de su fábrica entre llamadas.
+    # No es un método: no recibe self ni pertenece a una clase de agente.
     def agent(percept):
+        # La percepción es una tupla; loc es el índice real y dirty describe esa habitación.
         loc, dirty = percept
         if dirty:
-            # A dirty room repays its suck_cost fast (clean_reward accrues every
-            # remaining step), so cleaning the room we are standing in is always
-            # the rational immediate move.
+            # Una habitación sucia recupera pronto suck_cost: clean_reward se acumula en cada
+            # paso restante; con los valores del ejercicio, limpiar la habitación actual es
+            # la acción inmediata racional.
             cleaned[loc] = True
             return "Suck"
         cleaned[loc] = True
-        # Weigh the IMMEDIATE net change of crossing to the other (unseen) room.
-        # Moving costs move_cost now and cleans nothing this step, so the clean-
-        # room reward is unchanged: net(cross) = -move_cost. net(NoOp) = 0.
+        # Evalúa el cambio neto INMEDIATO de pasar a la otra habitación, que no observa.
+        # Moverse cuesta move_cost ahora y no limpia nada durante este paso; la recompensa
+        # por habitaciones limpias no cambia: net(cruzar) = -move_cost; net(NoOp) = 0.
+        # La decisión de desplazarse solo usa move_cost. suck_cost y clean_reward
+        # describen el modelo, pero esta implementación no los usa en una comparación explícita.
+        # Si hay suciedad, siempre devuelve Suck; conserva esa conducta del código de referencia.
         net_of_crossing = -move_cost
-        if net_of_crossing > 0:                     # never, under this cost model
+        if net_of_crossing > 0:                     # nunca, con este modelo de costo
             other = 1 - loc
             return "Right" if other == 1 else "Left"
-        return "NoOp"                                # crossing does not pay off
+        return "NoOp"                                # desplazarse no compensa
 
+    # Devuelve la función, sin ejecutarla. El simulador la llamará con cada percepción.
     return agent
 
 
+# Ejecuta el torneo al lanzar este archivo; importar solution no ejecuta este bloque.
 if __name__ == "__main__":
     from tournament import tournament, net_utility
 
+    # El diccionario guarda fábricas, no agentes ya creados: cada episodio tendrá memoria nueva.
+    # simple_reflex ya es una función de agente; lambda la devuelve con una interfaz de cero argumentos.
     factories = {
         "reflex": lambda: simple_reflex,
         "model": model_based,
