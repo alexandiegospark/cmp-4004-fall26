@@ -1,5 +1,5 @@
 """
-Studio de la Semana 3 — motor de búsqueda compartido.
+Taller de la semana 3 — motor de búsqueda compartido.
 
 Este archivo contiene la búsqueda genérica que se reutilizará después.
 La idea principal es que BFS, DFS y UCS utilizan el mismo ciclo de búsqueda;
@@ -20,6 +20,9 @@ from pathlib import Path
 # CLASE PROBLEM
 # ============================================================
 
+# POO: Problem define la interfaz común que la búsqueda espera de cualquier problema.
+# No usa abc ni @abstractmethod: puede instanciarse, pero actions/result lanzan una excepción
+# hasta que una subclase los implemente. La obligación se comprueba al ejecutar esos métodos.
 class Problem:
     """
     Clase base que representa un problema de búsqueda.
@@ -35,6 +38,8 @@ class Problem:
     HEREDAN de Problem y sobrescriben los métodos necesarios.
     """
 
+    # __init__ inicializa el objeto. self es la instancia concreta y Python lo pasa automáticamente.
+    # p = Problem(initial, goal) crea un objeto; p.initial y p.goal son atributos de ese objeto.
     def __init__(self, initial, goal=None):
         # Guarda el estado inicial y el estado objetivo.
         self.initial, self.goal = initial, goal
@@ -62,6 +67,9 @@ class Problem:
 # CLASE NODE
 # ============================================================
 
+# Un estado describe el mundo; un Node describe además un camino para llegar a ese estado.
+# Dos objetos Node pueden contener el mismo state y tener distintos parent, action o g.
+# Es composición: cada nodo enlaza otro objeto Node mediante su atributo parent.
 class Node:
     """
     Representa un nodo dentro del árbol/grafo de búsqueda.
@@ -75,6 +83,8 @@ class Node:
 
     # __slots__ limita los atributos que puede tener cada objeto Node.
     # También reduce el uso de memoria.
+    # Al no heredar un __dict__ de instancia, estos slots impiden añadir atributos arbitrarios.
+    # No hacen inmutable al objeto: sus cuatro atributos declarados sí pueden actualizarse.
     __slots__ = ("state", "parent", "action", "g")
 
     def __init__(self, state, parent=None, action=None, g=0):
@@ -90,6 +100,8 @@ class Node:
         """
 
         # Empezamos desde el nodo actual.
+        # self sigue siendo el nodo final; node es una referencia local que cambia al recorrer padres.
+        # La reconstrucción no modifica los nodos ni sus enlaces.
         node, out = self, []
 
         # Retrocedemos siguiendo los nodos padre.
@@ -114,6 +126,9 @@ class Node:
 # CLASE FRONTIER
 # ============================================================
 
+# Encapsulación: Frontier ofrece push/pop sin exigir que search conozca la estructura interna.
+# Usa composición: self.data contiene un deque o una lista. No hereda de esas clases.
+# Sus atributos son públicos; la separación depende de usar la interfaz por convención.
 class Frontier:
     """
     Representa la frontera de la búsqueda.
@@ -122,7 +137,7 @@ class Frontier:
 
     FIFO     -> BFS
     LIFO     -> DFS
-    Priority -> UCS
+    Prioridad -> UCS
 
     El ciclo principal de búsqueda es el mismo.
     Solo cambia la disciplina de la frontera.
@@ -160,6 +175,8 @@ class Frontier:
             # es decir, el costo acumulado del camino.
             heapq.heappush(
                 self.data,
+                # El contador único desempata costos iguales antes de que heapq compare objetos Node.
+                # Node no define __lt__: sin el desempate, comparar dos nodos podría fallar.
                 (node.g, next(self.counter), node)
             )
 
@@ -180,15 +197,17 @@ class Frontier:
         if self.kind == "fifo":
 
             # BFS utiliza FIFO:
-            # First In, First Out.
+            # Primero en entrar, primero en salir.
             # Sale el nodo que entró primero.
             return self.data.popleft()
 
         # DFS utiliza LIFO:
-        # Last In, First Out.
+        # Último en entrar, primero en salir.
         # Sale el nodo agregado más recientemente.
         return self.data.pop()
 
+    # Método especial: len(frontier) invoca __len__. Como no hay __bool__, Python también
+    # lo usa en while frontier: longitud cero significa False, y positiva significa True.
     def __len__(self):
         # Permite usar:
         # while frontier:
@@ -201,6 +220,9 @@ class Frontier:
 # BÚSQUEDA GENÉRICA
 # ============================================================
 
+# Polimorfismo: problem puede ser EightPuzzle, TinyGraph o MissionariesAndCannibals.
+# Al invocar problem.actions/result/is_goal/step_cost, Python selecciona los métodos de
+# su clase concreta; el bucle puede reutilizarse sin preguntar qué problema recibió.
 def search(problem, frontier_kind):
     """
     Búsqueda genérica sobre un grafo.
@@ -236,6 +258,8 @@ def search(problem, frontier_kind):
     frontier.push(start)
 
     # explored contiene los estados que ya fueron expandidos.
+    # Los estados deben poder usarse en un set: las tuplas de enteros y las cadenas son hashables.
+    # Se registran estados, no identidades de nodos, para reconocer caminos que llegan al mismo lugar.
     explored = set()
 
     # Contador de nodos expandidos.
@@ -256,6 +280,8 @@ def search(problem, frontier_kind):
         # Esto es especialmente importante para UCS,
         # porque probar el objetivo al generar puede devolver
         # una solución que no tenga el costo mínimo.
+        # El objetivo se comprueba al retirar de la frontera; aquí no se cuenta como expansión.
+        # Para UCS, retirar por menor g evita aceptar un objetivo costoso apenas se genera.
         if problem.is_goal(node.state):
             return node, expansions
 
@@ -307,6 +333,8 @@ def search(problem, frontier_kind):
 # TINYGRAPH
 # ============================================================
 
+# Hereda __init__ e is_goal de Problem y redefine acciones, transición y costo.
+# EDGES es un atributo de clase compartido, no un diccionario creado para cada instancia.
 class TinyGraph(Problem):
     """
     Grafo pequeño utilizado para demostrar por qué BFS y UCS
@@ -367,6 +395,8 @@ GOAL = (
 # CLASE EIGHTPUZZLE
 # ============================================================
 
+# Hereda la interfaz de Problem: redefine la transición y conserva el costo 1 por movimiento.
+# MOVES es una tabla compartida de clase; initial y goal pertenecen a cada instancia.
 class EightPuzzle(Problem):
     """
     Representa el problema del 8-puzzle.
@@ -411,6 +441,8 @@ class EightPuzzle(Problem):
         # Llamamos al constructor de la clase padre Problem.
         #
         # Esto es HERENCIA en POO.
+        # super() busca el método en la jerarquía de herencia y lo ejecuta sobre esta misma instancia.
+        # No crea un objeto Problem aparte: inicializa initial y goal dentro del EightPuzzle actual.
         super().__init__(initial, goal)
 
     def actions(self, state):
@@ -436,6 +468,7 @@ class EightPuzzle(Problem):
         s[b], s[action] = s[action], s[b]
 
         # Convertimos nuevamente el resultado a tupla.
+        # Devuelve un estado nuevo: no muta la tupla de entrada ni el atributo initial del problema.
         return tuple(s)
 
 
@@ -520,6 +553,7 @@ def load_instances(path=None):
 
     # Si no proporcionamos una ruta,
     # busca instances.json en la misma carpeta que este archivo.
+    # Path es una clase: su instancia representa una ruta; read_text es uno de sus métodos.
     path = Path(
         path or Path(__file__).with_name("instances.json")
     )

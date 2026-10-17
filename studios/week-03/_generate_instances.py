@@ -48,6 +48,8 @@ PINNED = {
 }
 
 
+# La BFS parte del objetivo porque cada movimiento del rompecabezas es reversible.
+# Con costo 1 por movimiento, la primera visita da la distancia mínima también hacia GOAL.
 def true_depths():
     """
     Realiza una BFS exhaustiva empezando desde GOAL y avanzando hacia atrás.
@@ -69,6 +71,8 @@ def true_depths():
 
     # Creamos un objeto EightPuzzle para poder usar sus métodos
     # actions() y result().
+    # POO: EightPuzzle hereda de Problem. pz es una instancia; sus métodos reciben self implícitamente.
+    # actions(s) y result(s, a) trabajan con el estado pasado, sin cambiar pz.initial.
     pz = EightPuzzle(GOAL)
 
     # Mientras existan estados pendientes por explorar...
@@ -130,6 +134,8 @@ def main():
 
     # Creamos un generador pseudoaleatorio usando una semilla fija.
     # Gracias a SEED, el resultado será siempre reproducible.
+    # Random es una clase; rng es una instancia con estado pseudoaleatorio propio.
+    # shuffle es su método: modifica pool en el lugar sin usar el generador global del módulo random.
     rng = random.Random(SEED)
 
     # Diccionario que finalmente será guardado como JSON.
@@ -182,6 +188,8 @@ def main():
 
     # Construimos la ruta del archivo instances.json
     # en la misma carpeta donde está este script.
+    # Path representa una ruta como objeto. with_name devuelve otra ruta en la misma carpeta;
+    # write_text escribe y reemplaza el archivo de destino cuando se ejecuta main().
     dest = Path(__file__).with_name("instances.json")
 
     # Convertimos el diccionario out a formato JSON

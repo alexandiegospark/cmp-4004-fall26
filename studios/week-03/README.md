@@ -1,124 +1,124 @@
-# Week 3 Studio — One Search Function, Four Algorithms
+# Taller de la semana 3 — Una función de búsqueda, cuatro algoritmos
 
-**Companion to** [`../../weeks/week-03.md`](../../weeks/week-03.md) — Session 3B.
-**Time budget:** Recap 5 · Breakouts 45 · Demos 20 · Debrief 10 (80 min total).
-**Deliverables:** all provided tests pass, a defensible problem formulation, and a
-log-scale scaling plot.
+**Complemento de** [`../../weeks/week-03.md`](../../weeks/week-03.md) — Sesión 3B.
+**Distribución del tiempo:** Repaso 5 · Trabajo en grupos 45 · Demostraciones 20 · Puesta en común 10 (80 min en total).
+**Entregables:** todas las pruebas proporcionadas superadas, una formulación del problema que puedas defender y una
+gráfica de escalabilidad en escala logarítmica.
 
-> **Recap (5 min).** *Why does the goal test go on **expansion**, not generation?*
-> Cold-call. If nobody has it, re-draw the 3-node graph (`TinyGraph` in `search.py`):
-> `start→A` costs 10, `start→B→A` costs 2. Testing at generation returns 10.
+> **Repaso (5 min).** *¿Por qué la prueba de objetivo se realiza al **expandir**, no al generar?*
+> Pregunta a estudiantes sin previo aviso. Si nadie responde, vuelve a dibujar el grafo de 3 nodos (`TinyGraph` en `search.py`):
+> `start→A` cuesta 10; `start→B→A` cuesta 2. Comprobar al generar devuelve 10.
 
-## Files in this folder
+## Archivos de esta carpeta
 
-| File | Purpose | You edit it? |
+| Archivo | Propósito | ¿Lo editas? |
 |---|---|---|
-| [`search.py`](search.py) | Given: `Problem`, `Node`, `Frontier`, the generic `search()`, and the `EightPuzzle` / `TinyGraph` fixtures — unchanged from the notebook | ❌ |
-| [`instances.json`](instances.json) | Given: 40 8-puzzle instances — 10 each at optimal depths 4, 8, 12, 16 (seed 20260807; depths verified by exhaustive BFS) | ❌ |
-| [`starter.py`](starter.py) | **Tasks 1–3** — formulate M&C, implement the four algorithms, measure | ✅ |
-| [`test_search.py`](test_search.py) | Provided tests, incl. `test_bfs_suboptimal_nonuniform_cost` | ❌ |
-| [`_generate_instances.py`](_generate_instances.py) | Regenerates `instances.json` (only if you rotate the seed) | ❌ |
+| [`search.py`](search.py) | Proporcionado: `Problem`, `Node`, `Frontier`, la función genérica `search()` y los problemas de ejemplo `EightPuzzle` / `TinyGraph`, sin cambios respecto al notebook | ❌ |
+| [`instances.json`](instances.json) | Proporcionado: 40 instancias del rompecabezas de 8 fichas, 10 por profundidad óptima 4, 8, 12 y 16 (semilla 20260807; profundidades verificadas mediante BFS exhaustiva) | ❌ |
+| [`starter.py`](starter.py) | **Tareas 1–3** — formula misioneros y caníbales, implementa los cuatro algoritmos y mide | ✅ |
+| [`test_search.py`](test_search.py) | Pruebas proporcionadas, incluida `test_bfs_suboptimal_nonuniform_cost` | ❌ |
+| [`_generate_instances.py`](_generate_instances.py) | Regenera `instances.json` (solo si cambias la semilla) | ❌ |
 
-The `search()` interface here is the course's **most reused artifact**: week 4's
-A\* is a 10-line diff on it, and week 9's planner imports it unchanged. Get it
-right and the next weeks are much faster.
+La interfaz `search()` es el **recurso más reutilizado** del curso: A\* de la semana 4
+requiere cambiar unas 10 líneas, y el planificador de la semana 9 la importa sin cambios. Hazlo
+bien y las semanas siguientes serán mucho más rápidas.
 
-## Task 1 — Formulate missionaries & cannibals (10 min)
+## Tarea 1 — Formula misioneros y caníbales (10 min)
 
-Open `starter.py` and fill in `MissionariesAndCannibals(Problem)`: initial state,
-`actions`, `result`, and `is_goal`. **No searching yet** — this is the five-component
-formulation from the slides, as code.
+Abre `starter.py` y completa `MissionariesAndCannibals(Problem)`: estado inicial,
+`actions`, `result` e `is_goal`. **Todavía no hagas búsquedas**: es la formulación de cinco componentes
+de las diapositivas expresada en código.
 
-Three missionaries, three cannibals, one boat carrying 1 or 2 (never empty). If
-cannibals ever **outnumber** missionaries on *either* bank — including the bank the
-boat just left — the missionaries are eaten. Get everyone across.
+Tres misioneros, tres caníbales y un bote que lleva 1 o 2 personas, nunca vacío. Si
+los caníbales **superan en número** a los misioneros en *cualquiera* de las orillas, incluida la que
+acaba de dejar el bote, los misioneros son devorados. Lleva a todos al otro lado.
 
-Two things surface every year, and both are the point:
+Cada año surgen dos cuestiones, y ambas son parte del objetivo:
 
-1. The constraint applies to **both** banks, *including the one you just left*.
-2. Do you exclude illegal states in `actions()` or in `result()`? **Both are
-   legitimate designs.** Pick one and be ready to *defend* it in the demo — that
-   argument is the week's real skill. *Half of applied AI is choosing a good
-   representation before you write any algorithm.*
+1. La restricción se aplica a **ambas** orillas, *incluida la que acabas de dejar*.
+2. ¿Excluyes los estados ilegales en `actions()` o en `result()`? **Ambos diseños son
+   legítimos.** Elige uno y prepárate para *defenderlo* en la demostración: esa
+   argumentación es la habilidad central de la semana. *La mitad de la IA aplicada consiste en elegir una buena
+   representación antes de escribir cualquier algoritmo.*
 
-Formulation is graded, not just the code.
+Se evalúa la formulación, no solo el código.
 
-## Task 2 — Implement all four (25 min)
+## Tarea 2 — Implementa los cuatro algoritmos (25 min)
 
-Still in `starter.py`. Fill in `bfs`, `dfs`, `ucs`, and `ids`.
+En el mismo `starter.py`, completa `bfs`, `dfs`, `ucs` e `ids`.
 
-Three of them are **one line each** — that is the insight of the week. BFS, DFS,
-and UCS are the *same* `search()` loop with a different frontier discipline:
+Tres de ellos requieren **una línea cada uno**: esa es la idea de la semana. BFS, DFS
+y UCS son el *mismo* bucle `search()` con distinta disciplina de frontera:
 
-| Algorithm | `frontier_kind` | Complete? | Optimal? | Space |
+| Algoritmo | `frontier_kind` | ¿Completo? | ¿Óptimo? | Espacio |
 |---|---|---|---|---|
-| BFS | `"fifo"` | Yes | Uniform costs **only** | O(b^d) |
-| DFS | `"lifo"` | Finite spaces w/ cycle control | No | O(bm) |
-| UCS | `"priority"` | Yes | **Yes** (non-neg. costs) | O(b^(1+⌊C\*/ε⌋)) |
-| IDS | depth-limited, iterated | Yes | Uniform costs only | **O(bd)** |
+| BFS | `"fifo"` | Sí | **solo** con costos uniformes | O(b^d) |
+| DFS | `"lifo"` | Espacios finitos con control de ciclos | No | O(bm) |
+| UCS | `"priority"` | Sí | **Sí** (costos no negativos) | O(b^(1+⌊C\*/ε⌋)) |
+| IDS | profundidad limitada, repetida | Sí | solo con costos uniformes | **O(bd)** |
 
-`ids` is the interesting one and does **not** call `search()`. Write a recursive
-`depth_limited(problem, limit)` that returns `(node, expansions, hit_limit)`, then
-iterate the limit from 0 upward. IDS buys BFS's completeness at DFS's memory cost
-by re-doing the shallow work — and the redundancy is a *constant factor*, not an
-exponential one (≈11 % at b≈10). Cheap.
+`ids` es el interesante y **no** llama a `search()`. Escribe una función recursiva
+`depth_limited(problem, limit)` que devuelva `(node, expansions, hit_limit)` y luego
+aumenta el límite desde 0. IDS obtiene la completitud de BFS con el consumo de memoria de DFS
+repitiendo el trabajo de los niveles superficiales. La redundancia es un *factor constante*, no
+exponencial (≈11 % con b≈10). Es un costo bajo.
 
-Then run:
+Después ejecuta:
 
 ```bash
 python3 test_search.py
 ```
 
-All five must pass. The one to read carefully is
-`test_bfs_suboptimal_nonuniform_cost` — **it asserts BFS returns the wrong (cost-10)
-path** on `TinyGraph`. That is not a broken test. BFS's optimality claim has a
-condition (uniform step costs); this instance violates it. A guarantee you cannot
-watch fail is a guarantee you have not understood. The other four:
+Las cinco pruebas deben pasar. Lee con atención
+`test_bfs_suboptimal_nonuniform_cost`: **comprueba que BFS devuelve el camino incorrecto de
+costo 10** en `TinyGraph`. La prueba no está defectuosa. La optimalidad de BFS tiene una
+condición: costos uniformes por paso. Esta instancia la incumple. Una garantía cuyo fallo no puedes
+observar es una garantía que no has comprendido. Las otras cuatro:
 
-- `test_bfs_optimal_uniform_cost` — on the 8-puzzle (every move costs 1), BFS *is* optimal.
-- `test_dfs_terminates_on_cyclic_graph` — DFS on a 3-cycle **terminates** only
-  because `search()` keeps an explored set. Delete it and this hangs.
-- `test_ucs_optimal_nonuniform_cost` — UCS returns the cost-2 path `TinyGraph`. This
-  is *why UCS exists*.
-- `test_ids_matches_bfs_solution_length` — IDS finds the same-length solution as BFS
-  at O(bd) memory.
+- `test_bfs_optimal_uniform_cost` — en el rompecabezas de 8 fichas, cada movimiento cuesta 1 y BFS *sí es* óptima.
+- `test_dfs_terminates_on_cyclic_graph` — DFS en un ciclo de 3 nodos **termina** solo
+  porque `search()` mantiene un conjunto de explorados. Si lo eliminas, la búsqueda no termina.
+- `test_ucs_optimal_nonuniform_cost` — UCS devuelve el camino de costo 2 en `TinyGraph`. Esta
+  es *la razón por la que existe UCS*.
+- `test_ids_matches_bfs_solution_length` — IDS encuentra una solución de la misma longitud que BFS
+  con memoria O(bd).
 
-## Task 3 — Measure (10 min)
+## Tarea 3 — Mide (10 min)
 
-Run all four on the provided 8-puzzle bank — depths 4, 8, 12, 16, ten instances
-each. `starter.measure()` gives you the loop. Produce:
+Ejecuta los cuatro algoritmos sobre el banco proporcionado: profundidades 4, 8, 12 y 16, con diez instancias
+por profundidad. `starter.measure()` proporciona el bucle. Produce:
 
-- **Table:** expansions, solution length (add max frontier size / wall-clock if you like).
-- **Plot:** expansions vs. depth, **log y-axis**.
+- **Tabla:** expansiones y longitud de la solución; puedes añadir el tamaño máximo de frontera y el tiempo real.
+- **Gráfica:** expansiones frente a profundidad, con **eje y logarítmico**.
 
-The log-scale plot is *the* deliverable. Straight lines on a log axis mean
-exponential growth — and seeing it in your own data is what makes the warm-up poll
-finally land. Never write a search without the `expansions` counter: it is the only
-currency in which these four can be compared (scorecard axis 3).
+La gráfica logarítmica es *el* entregable. Las líneas rectas en un eje logarítmico indican
+crecimiento exponencial: verlo en tus propios datos permite comprender por fin la encuesta
+inicial. Nunca escribas una búsqueda sin el contador `expansions`: es la única
+unidad con la que se pueden comparar estos cuatro algoritmos (eje 3 de la ficha de evaluación).
 
-## Demos (20 min)
+## Demostraciones (20 min)
 
-Two pairs. One presents the **formulation disagreement** from Task 1 (`actions()`
-vs. `result()` — make them defend it). One presents the **scaling plot**. For the
-plot, ask: *extrapolate to depth 24 — is your laptop enough?* (No. And that is why
-week 4 exists.)
+Dos parejas. Una presenta la **discrepancia de formulación** de la tarea 1 (`actions()`
+frente a `result()`: pide que defiendan su elección). Otra presenta la **gráfica de escalabilidad**. Sobre la
+gráfica, pregunta: *extrapola a profundidad 24; ¿será suficiente tu portátil?* (No. Por eso
+existe la semana 4.)
 
-## Debrief (10 min)
+## Puesta en común (10 min)
 
-- Uninformed search is **complete but blind**. Every guarantee we have costs
-  exponential resources.
-- DFS *found* a goal on the deep instances — a terrible one, hundreds of moves long.
-  Optimality is not a nice-to-have you can eyeball.
-- **No LLM comparison this week, deliberately:** you cannot evaluate a competitor
-  until you can measure the incumbent. Week 4 is the first duel.
-- Keep this code. Next week adds one thing — a heuristic — and A\* is a 10-line diff.
+- La búsqueda no informada es **completa, pero ciega**. Todas nuestras garantías cuestan
+  recursos exponenciales.
+- DFS *encontró* un objetivo en las instancias profundas: uno terrible, a cientos de movimientos.
+  La optimalidad no es un detalle opcional que puedas estimar a simple vista.
+- **Esta semana no hay comparación con LLM, deliberadamente:** no puedes evaluar a un competidor
+  hasta poder medir el sistema de referencia. La semana 4 será el primer duelo.
+- Conserva este código. La próxima semana añade una heurística y A\* requiere cambiar unas 10 líneas.
 
-> **Failure Atlas entry due.** Classical failures count: an exponential blowup is a
-> failure worth documenting.
+> **Entrega de la entrada del Atlas de Fallos.** Los fallos clásicos cuentan: una explosión exponencial es un
+> fallo que merece documentarse.
 
-## Links
+## Enlaces
 
-- Session 3A notebook — [`../../notebooks/week-03-uninformed-search.ipynb`](../../notebooks/week-03-uninformed-search.ipynb)
-- Week 4 studio (A\* on top of this interface) — [`../week-04/`](../week-04/)
-- Duel 1 spec (uses this `search()`) — [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md)
-- AI policy (`AI_LOG.md`) — [`../../resources/ai-policy.md`](../../resources/ai-policy.md)
+- Notebook de la sesión 3A — [`../../notebooks/week-03-uninformed-search.ipynb`](../../notebooks/week-03-uninformed-search.ipynb)
+- Taller de la semana 4 (A\* sobre esta interfaz) — [`../week-04/`](../week-04/)
+- Especificación del duelo 1 (usa `search()`) — [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md)
+- Política de IA (`AI_LOG.md`) — [`../../resources/ai-policy.md`](../../resources/ai-policy.md)

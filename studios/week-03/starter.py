@@ -1,15 +1,15 @@
 """
-Studio de la Semana 3 — archivo starter.
+Taller de la semana 3 — archivo starter.
 
 Aquí debes completar tres tareas principales:
 
-Task 1:
+Tarea 1:
     Formular el problema de Misioneros y Caníbales.
 
-Task 2:
+Tarea 2:
     Implementar BFS, DFS, UCS e IDS.
 
-Task 3:
+Tarea 3:
     Medir el comportamiento de los cuatro algoritmos
     utilizando varias instancias del 8-puzzle.
 
@@ -43,7 +43,7 @@ from search import Problem, Node, search
 
 
 # ============================================================
-# TASK 1: MISIONEROS Y CANÍBALES
+# TAREA 1: MISIONEROS Y CANÍBALES
 # ============================================================
 
 # El problema tiene:
@@ -92,6 +92,9 @@ from search import Problem, Node, search
 # (0, 0, 1)
 
 
+# Herencia: esta subclase adapta la interfaz de Problem a otro dominio.
+# search utiliza polimorfismo: llamará a los métodos que definas aquí sin cambiar el motor.
+# step_cost se hereda; su valor 1 permite medir el número de cruces como costo del plan.
 class MissionariesAndCannibals(Problem):
     """
     Clase que representará el problema de Misioneros y Caníbales.
@@ -109,6 +112,8 @@ class MissionariesAndCannibals(Problem):
     - prueba de objetivo
     """
 
+    # self representa el mismo objeto durante toda la inicialización y las llamadas a sus métodos.
+    # super().__init__ inicializará atributos heredados en esa instancia, sin crear un segundo objeto.
     def __init__(self):
 
         # Aquí debemos definir:
@@ -122,9 +127,13 @@ class MissionariesAndCannibals(Problem):
         #
         # super() permite utilizar el constructor de la clase padre.
         #
+        # TODO marca una tarea pendiente y es solo documentación. raise NotImplementedError sí
+        # detiene la llamada hasta que completes este método; aquí se conserva el ejercicio original.
         # TODO: establecer estado inicial y objetivo.
         raise NotImplementedError
 
+    # Redefinición de un método heredado: las acciones de este dominio son cargas del bote.
+    # state es un dato de entrada; no equivale a self, que es el objeto problema.
     def actions(self, state):
         """
         Debe retornar todas las acciones LEGALES
@@ -158,6 +167,8 @@ class MissionariesAndCannibals(Problem):
         # TODO: retornar las cargas legales del bote.
         raise NotImplementedError
 
+    # La transición debe devolver un estado nuevo sin alterar el estado recibido.
+    # Usar una tupla de enteros permite guardar los estados en explored de search.
     def result(self, state, action):
         """
         Aplica una acción a un estado.
@@ -188,7 +199,7 @@ class MissionariesAndCannibals(Problem):
 
 
 # ============================================================
-# TASK 2: LOS CUATRO ALGORITMOS
+# TAREA 2: LOS CUATRO ALGORITMOS
 # ============================================================
 
 # search(problem, frontier_kind) YA EXISTE en search.py.
@@ -207,9 +218,11 @@ class MissionariesAndCannibals(Problem):
 # con límites de profundidad crecientes.
 
 
+# Las funciones bfs/dfs/ucs reciben el objeto problema y delegan en el mismo motor.
+# Los nombres fifo/lifo/priority deben conservarse: Frontier los interpreta literalmente.
 def bfs(problem):
     """
-    Breadth-First Search — búsqueda en anchura.
+    Búsqueda en anchura (BFS).
 
     Propiedades:
 
@@ -228,7 +241,7 @@ def bfs(problem):
 
 def dfs(problem):
     """
-    Depth-First Search — búsqueda en profundidad.
+    Búsqueda en profundidad (DFS).
 
     Explora primero una rama tan profundamente como sea posible.
 
@@ -246,7 +259,7 @@ def dfs(problem):
 
 def ucs(problem):
     """
-    Uniform-Cost Search — búsqueda de costo uniforme.
+    Búsqueda de costo uniforme (UCS).
 
     UCS selecciona siempre el nodo cuyo costo acumulado g
     sea el menor.
@@ -264,9 +277,12 @@ def ucs(problem):
 
 
 # ============================================================
-# DEPTH-LIMITED SEARCH
+# BÚSQUEDA CON PROFUNDIDAD LIMITADA
 # ============================================================
 
+# La recursión explora una rama con límite; cada llamada conserva sus variables locales.
+# El objeto Node enlaza padres para reconstruir la solución sin almacenar todos los caminos completos.
+# Mantener solo el camino activo y sus alternativas es distinto de un conjunto global de explorados.
 def depth_limited(problem, limit):
     """
     Realiza una búsqueda DFS con un límite máximo de profundidad.
@@ -302,7 +318,7 @@ def depth_limited(problem, limit):
         de cortar por el límite.
     """
 
-    # IDS utiliza TREE SEARCH en esta parte.
+    # IDS utiliza BÚSQUEDA EN ÁRBOL en esta parte.
     #
     # No guarda todos los estados explorados globalmente,
     # porque eso aumentaría el uso de memoria.
@@ -319,12 +335,14 @@ def depth_limited(problem, limit):
 
 
 # ============================================================
-# ITERATIVE DEEPENING SEARCH
+# BÚSQUEDA CON PROFUNDIZACIÓN ITERATIVA
 # ============================================================
 
+# Cada iteración reinicia la búsqueda limitada, pero acumula expansiones para medir el trabajo total.
+# El límite máximo también acota lo que puede encontrar esta implementación.
 def ids(problem, max_depth=40):
     """
-    Iterative Deepening Search — profundización iterativa.
+    Búsqueda con profundización iterativa (IDS).
 
     IDS ejecuta repetidamente una búsqueda DFS limitada.
 
@@ -380,7 +398,7 @@ def ids(problem, max_depth=40):
 
 
 # ============================================================
-# TASK 3: MEDICIÓN DE LOS ALGORITMOS
+# TAREA 3: MEDICIÓN DE LOS ALGORITMOS
 # ============================================================
 
 def measure(bank=None):
@@ -431,6 +449,8 @@ def measure(bank=None):
 
             # Creamos el problema del 8-puzzle
             # utilizando este estado como estado inicial.
+            # POO: EightPuzzle es la clase; p es una instancia con initial=state y el objetivo heredado.
+            # El mismo objeto describe el problema para los cuatro algoritmos; cada búsqueda crea sus nodos.
             p = EightPuzzle(state)
 
             # Ejecutamos los cuatro algoritmos
@@ -446,6 +466,8 @@ def measure(bank=None):
                 #
                 # node = solución encontrada.
                 # exp  = número de expansiones.
+                # Las funciones son objetos: algo guarda la referencia al algoritmo, y algo(p) lo ejecuta.
+                # El desempaquetado separa el Node objetivo y el contador de expansiones.
                 node, exp = algo(p)
 
                 # node.path() retorna la lista de acciones
