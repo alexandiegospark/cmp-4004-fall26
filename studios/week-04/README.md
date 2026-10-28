@@ -1,64 +1,64 @@
-# Week 4 Studio — Heuristics on a Weighted Grid
+# Taller de la semana 4 — Heurísticas en una cuadrícula con costos de terreno
 
-**Companion to** [`../../weeks/week-04.md`](../../weeks/week-04.md) — Session B.
-**Time budget:** Recap 5 · Breakouts 45 · Demos 20 · Debrief 10 (80 min total).
-**Deliverables:** all provided tests pass, and a scaling plot for the LLM duel.
+**Complemento de** [`../../weeks/week-04.md`](../../weeks/week-04.md) — Sesión B.
+**Distribución del tiempo:** Repaso 5 · Trabajo en grupos 45 · Demostraciones 20 · Puesta en común 10 (80 min en total).
+**Entregables:** todas las pruebas proporcionadas superadas y una gráfica de escalabilidad para el duelo con el LLM.
 
-> **Warm-up (5 min).** *Why was `h_bad` faster in the notebook? What did it cost?*
+> **Actividad inicial (5 min).** *¿Por qué `h_bad` fue más rápida en el notebook? ¿A qué costo?*
 
-## Files in this folder
+## Archivos de esta carpeta
 
-| File | Purpose | You edit it? |
+| Archivo | Propósito | ¿Lo editas? |
 |---|---|---|
-| [`gridworld.py`](gridworld.py) | Given: the A* engine + weighted-grid problem, unchanged from the notebook | ❌ |
-| [`instances.json`](instances.json) | Given: 40 seeded grids — 10 each at 5×5, 8×8, 12×12, 16×16 (seed 20260807) | ❌ |
-| [`starter.py`](starter.py) | **Task 1** — fill in four heuristics (three admissible, one deliberately bad) | ✅ |
-| [`test_heuristics.py`](test_heuristics.py) | Provided tests, incl. `test_inadmissible_heuristic_returns_suboptimal_path` | ❌ |
-| [`duel.py`](duel.py) | **Task 2** — checker + scoring categories + the exact prompt from the plan | ❌ (use it) |
-| [`_generate_instances.py`](_generate_instances.py) | Regenerates `instances.json` (only needed if you rotate the seed) | ❌ |
+| [`gridworld.py`](gridworld.py) | Proporcionado: el motor A* y el problema de cuadrícula con costos de terreno, sin cambios respecto al notebook | ❌ |
+| [`instances.json`](instances.json) | Proporcionado: 40 cuadrículas generadas con semilla fija, 10 de cada tamaño: 5×5, 8×8, 12×12 y 16×16 (semilla 20260807) | ❌ |
+| [`starter.py`](starter.py) | **Tarea 1** — completa cuatro heurísticas: tres admisibles y una deliberadamente incorrecta | ✅ |
+| [`test_heuristics.py`](test_heuristics.py) | Pruebas proporcionadas, incluida `test_inadmissible_heuristic_returns_suboptimal_path` | ❌ |
+| [`duel.py`](duel.py) | **Tarea 2** — verificador, categorías de evaluación y el prompt exacto del plan | ❌ (úsalo) |
+| [`_generate_instances.py`](_generate_instances.py) | Regenera `instances.json`; solo es necesario si cambias la semilla | ❌ |
 
-## Task 1 — Heuristics + provided tests (15 min)
+## Tarea 1 — Heurísticas y pruebas proporcionadas (15 min)
 
-Open `starter.py`. Implement:
+Abre `starter.py`. Implementa:
 
-- `h_manhattan` — plain Manhattan (admissible **here** because `MIN_COST == 1`; ask yourself when it stops being admissible)
-- `h_manhattan_scaled` — Manhattan × `MIN_COST` (the correct admissible heuristic in general)
-- `h_euclidean_scaled` — Euclidean × `MIN_COST` (admissible but weaker on a 4-connected grid)
-- `h_bad` — **inadmissible** on purpose. Suggested form: `MAX_COST × Manhattan` (that is, `8 × Manhattan` — it overestimates a path that runs through mostly cheap cells)
+- `h_manhattan` — distancia de Manhattan sin escalar, admisible **aquí** porque `MIN_COST == 1`; pregúntate cuándo deja de ser admisible.
+- `h_manhattan_scaled` — Manhattan × `MIN_COST`, la heurística admisible correcta en general.
+- `h_euclidean_scaled` — distancia euclidiana × `MIN_COST`, admisible pero menos informada en una cuadrícula con cuatro direcciones de movimiento.
+- `h_bad` — **no admisible** deliberadamente. Forma sugerida: `MAX_COST × Manhattan`, es decir, `8 × Manhattan`: sobreestima un camino que pasa principalmente por celdas baratas.
 
-Then:
+Después ejecuta:
 
 ```bash
 python3 test_heuristics.py
 ```
 
-All five tests must pass. The last one — `test_inadmissible_heuristic_returns_suboptimal_path` — is the point: it asserts that `h_bad` breaks optimality on **at least one** of the 40 instances. A test that expects *failure* is not a mistake; watching a guarantee fail *once* is how you know the guarantee is real.
+Las cinco pruebas deben pasar. La última, `test_inadmissible_heuristic_returns_suboptimal_path`, es el objetivo: comprueba que `h_bad` rompe la optimalidad en **al menos una** de las 40 instancias. Una prueba que espera un *fallo* no es un error; observar el fallo de una garantía *una vez* permite comprender su importancia.
 
-Fast-finishing pairs: **If `MIN_COST` were 2 instead of 1, would plain Manhattan still be admissible? Would it be dominated by `h_manhattan_scaled`?** Be able to say why in one sentence.
+Para las parejas que terminen pronto: **Si `MIN_COST` fuera 2 en lugar de 1, ¿seguiría siendo admisible Manhattan sin escalar? ¿La dominaría `h_manhattan_scaled`?** Deben poder explicar por qué en una oración.
 
-## Task 2 — The duel: LLM vs. A* (25 min)
+## Tarea 2 — El duelo: LLM frente a A* (25 min)
 
-Give an LLM the same grids A* just solved. `duel.py` has the exact prompt from the plan and a checker that classifies every reply into **four categories** (do not conflate them):
+Dale al LLM las mismas cuadrículas que A* acaba de resolver. `duel.py` contiene el prompt exacto del plan y un verificador que clasifica cada respuesta en **cuatro categorías**; no las confundas:
 
-1. **illegal** — path is out of bounds or non-contiguous
-2. **suboptimal** — legal path but total cost > A*'s optimum
-3. **wrong_cost** — legal & optimal path, but the model's self-reported cost is wrong (⚠️ this is the interesting one)
-4. **correct** — all three match
+1. **illegal** — el camino sale de los límites o no es contiguo.
+2. **suboptimal** — el camino es legal, pero su costo total supera el óptimo de A*.
+3. **wrong_cost** — el camino es legal y óptimo, pero el costo declarado por el modelo es incorrecto (⚠️ esta es la categoría interesante).
+4. **correct** — se cumplen las tres condiciones.
 
-**Protocol (from the plan, non-negotiable for a valid scaling curve):**
+**Protocolo del plan, obligatorio para obtener una curva de escalabilidad válida:**
 
-- **Four sizes:** 5×5, 8×8, 12×12, 16×16 — 10 instances each.
-- Score every reply with `duel.score_llm_reply()`. Do **not** believe the model's self-reported cost — recompute with the checker.
-- If you are on the manual backend, cap at **5 instances per size** and note it (scorecard axis 6).
+- **Cuatro tamaños:** 5×5, 8×8, 12×12 y 16×16, con 10 instancias de cada uno.
+- Evalúa cada respuesta con `duel.score_llm_reply()`. **No** creas el costo declarado por el modelo: vuelve a calcularlo con el verificador.
+- Si usas el backend manual, limita el trabajo a **5 instancias por tamaño** e indícalo (eje 6 de la ficha de evaluación).
 
-Sketch:
+Esquema:
 
 ```python
-from aicourse.llm import LLM   # or your own local client
+from aicourse.llm import LLM   # o tu propio cliente local
 from duel import prompt_for, parse_reply, score_llm_reply
 from gridworld import load_instances
 
-model = LLM()  # your configured backend
+model = LLM()  # el backend que hayas configurado
 bank = load_instances()
 rows = []
 for size in [5, 8, 12, 16]:
@@ -68,23 +68,23 @@ for size in [5, 8, 12, 16]:
         rows.append((size, score_llm_reply(grid, path, cost).category))
 ```
 
-**Task 3 — Plot (5 min).** Optimality rate (`correct / n`) vs. grid size. Two lines: A* at 100%, LLM declining. This plot goes in Duel 1.
+**Tarea 3 — Gráfica (5 min).** Tasa de optimalidad (`correct / n`) frente al tamaño de la cuadrícula. Dos líneas: A* en el 100 % y el LLM descendiendo. Esta gráfica se incluye en el duelo 1.
 
-## Demos (20 min)
+## Demostraciones (20 min)
 
-- Ask specifically for the scaling plots. The characteristic shape — A* flat, LLM cliff — is best discovered by students, then seen to *replicate* across the room. Three pairs showing the same cliff stops being anecdote.
-- Solicit: *did anyone's LLM return a path shorter than A*'s optimum?* If yes, it is **illegal** or **wrong_cost** — a live debugging moment.
+- Pide específicamente las gráficas de escalabilidad. La forma característica, A* estable y el LLM con una caída abrupta, se comprende mejor cuando los estudiantes la descubren y ven que se *reproduce* en toda la clase. Tres parejas que muestran la misma caída dejan de ser una anécdota.
+- Pregunta: *¿el LLM de alguien devolvió un camino más corto que el óptimo de A*?* Si ocurrió, es **illegal** o **wrong_cost**: una oportunidad de depurar en vivo.
 
-## Debrief (10 min)
+## Puesta en común (10 min)
 
-- A* is optimal **because** of a provable property. `h_bad` shows that property fail on request.
-- The LLM has no such property. Its performance is an empirical average over your distribution and it tells you nothing about instance #31.
-- Anti-pattern to name and shame: **using the model as its own oracle** ("does your path look correct?"). Always validate with the checker. This is scorecard axis 3.
-- **Duel 1 is live.** See [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md).
+- A* es óptima **porque** se cumple una propiedad demostrable. `h_bad` permite observar deliberadamente el fallo de esa propiedad.
+- El LLM no tiene esa propiedad. Su desempeño es un promedio empírico sobre tu distribución y no dice nada sobre la instancia n.º 31.
+- Mala práctica que debes señalar: **usar el modelo como su propio oráculo** («¿parece correcto tu camino?»). Valida siempre con el verificador. Corresponde al eje 3 de la ficha de evaluación.
+- **El duelo 1 ya está disponible.** Consulta [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md).
 
-## Links
+## Enlaces
 
-- Session A notebook — [`../../notebooks/week-04-astar-heuristics.ipynb`](../../notebooks/week-04-astar-heuristics.ipynb)
-- Duel 1 spec — [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md)
-- Duel scorecard — [`../../resources/duel-scorecard.md`](../../resources/duel-scorecard.md)
-- AI policy (`AI_LOG.md`) — [`../../resources/ai-policy.md`](../../resources/ai-policy.md)
+- Notebook de la sesión A — [`../../notebooks/week-04-astar-heuristics.ipynb`](../../notebooks/week-04-astar-heuristics.ipynb)
+- Especificación del duelo 1 — [`../../projects/duel-1-search.md`](../../projects/duel-1-search.md)
+- Ficha de evaluación del duelo — [`../../resources/duel-scorecard.md`](../../resources/duel-scorecard.md)
+- Política de IA (`AI_LOG.md`) — [`../../resources/ai-policy.md`](../../resources/ai-policy.md)

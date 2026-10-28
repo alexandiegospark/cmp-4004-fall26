@@ -1,103 +1,103 @@
-# Week 5 Studio — The Connect-4 Tournament
+# Taller de la semana 5 — El torneo de Conecta 4
 
-**Companion to** [`../../weeks/week-05.md`](../../weeks/week-05.md) — Session 5B.
-**Time budget:** Setup 10 · Rounds + commentary 35 · LLM challenger 20 · Debrief 15 (80 min total).
-**Deliverable:** a working `choose_move` agent, **submitted 24 h before class** so it can be smoke-tested.
+**Complemento de** [`../../weeks/week-05.md`](../../weeks/week-05.md) — Sesión 5B.
+**Distribución del tiempo:** Preparación 10 · Rondas y comentarios 35 · LLM retador 20 · Puesta en común 15 (80 min en total).
+**Entregable:** un agente `choose_move` funcional, **entregado 24 h antes de la clase** para realizar una prueba básica.
 
-> **This studio is different.** Session 5B *is the tournament* — the 80 minutes
-> are spent running the round-robin, narrating it, and entering the LLM
-> challenger. The agent you play is built **before** class using this kit. Read
-> "Build your agent" first; do it at home. Bring a passing `test_alphabeta.py`.
+> **Este taller es diferente.** La sesión 5B *es el torneo*: los 80 minutos
+> se dedican a ejecutar y comentar las partidas de todos contra todos e incorporar al
+> LLM retador. El agente con el que juegas se construye **antes** de la clase con este material.
+> Lee primero «Construye tu agente» y hazlo en casa. Lleva `test_alphabeta.py` con sus pruebas superadas.
 
-## Files in this folder
+## Archivos de esta carpeta
 
-| File | Purpose | You edit it? |
+| Archivo | Propósito | ¿Lo editas? |
 |---|---|---|
-| [`connect4.py`](connect4.py) | Given: the board, `minimax`, `alphabeta`, the static orderings, and the `play` self-play harness — verbatim from the notebook | ❌ |
-| [`starter.py`](starter.py) | **Your agent** — `order_moves` + iterative-deepening `choose_move(board, time_budget_ms)` | ✅ |
-| [`test_alphabeta.py`](test_alphabeta.py) | Provided tests, incl. the two *guarantee* tests | ❌ |
+| [`connect4.py`](connect4.py) | Proporcionado: el tablero, `minimax`, `alphabeta`, los órdenes estáticos y la función de enfrentamiento `play`, tomados literalmente del notebook | ❌ |
+| [`starter.py`](starter.py) | **Tu agente** — `order_moves` y `choose_move(board, time_budget_ms)` con profundización iterativa | ✅ |
+| [`test_alphabeta.py`](test_alphabeta.py) | Pruebas proporcionadas, incluidas las dos pruebas de *garantías* | ❌ |
 
-## Build your agent (at home, before Session 5B)
+## Construye tu agente en casa, antes de la sesión 5B
 
-The tournament enforces one interface and one hard constraint:
+El torneo exige una interfaz y una restricción estricta:
 
 ```python
 def choose_move(board, time_budget_ms) -> int: ...
 ```
 
-**Hard rules (from the plan):** 500 ms per move · no external processes · no
-network calls · no opening book larger than 20 positions. A move over budget
-forfeits.
+**Reglas estrictas del plan:** 500 ms por jugada · sin procesos externos · sin
+llamadas de red · sin un libro de aperturas de más de 20 posiciones. Superar el tiempo
+permitido en una jugada implica perder la partida.
 
-Open `starter.py` and fill in two functions:
+Abre `starter.py` y completa dos funciones:
 
-- **`order_moves(board)`** — the legal columns, best-first. α-β's O(b^(m/2)) best
-  case (double the reachable depth) only happens if you examine strong moves
-  first. A center-first static order (`CENTER_FIRST` = `[3, 2, 4, 1, 5, 0, 6]`,
-  provided) is a fine start.
-- **`choose_move(board, time_budget_ms)`** — **iterative deepening** over the
-  given `alphabeta`: search depth 1, then 2, then 3, …, keep the best move from
-  the last *completed* depth, and stop when the clock runs out. This is what the
-  plan calls a *time-bounded anytime* agent, and it is the single thing that
-  most often decides the bracket — a fixed-depth agent either wastes budget or
-  forfeits.
+- **`order_moves(board)`** — devuelve las columnas legales, de mejor a peor. El mejor caso O(b^(m/2))
+  de α-β, que duplica la profundidad alcanzable, solo se obtiene si examinas primero
+  las jugadas fuertes. El orden estático que empieza por el centro, `CENTER_FIRST` =
+  `[3, 2, 4, 1, 5, 0, 6]`, ya proporcionado, es un buen comienzo.
+- **`choose_move(board, time_budget_ms)`** — aplica **profundización iterativa** al
+  `alphabeta` proporcionado: busca a profundidad 1, después 2, luego 3, etc.;
+  conserva la mejor jugada de la última profundidad *completada* y detente cuando se
+  agote el tiempo. El plan lo llama agente *con límite temporal que conserva una respuesta disponible*,
+  y suele ser lo que decide el torneo: un agente de profundidad fija desperdicia tiempo
+  o pierde por excederlo.
 
-Then run:
+Después ejecuta:
 
 ```bash
 python3 test_alphabeta.py
 ```
 
-All seven tests must pass. Five exercise *your* `choose_move` /`order_moves`
-(legality, taking an immediate win, blocking an immediate threat, respecting the
-budget). The other two use the given engine and are the point of the week — see
-below. With the starter unfilled they print `not implemented yet`; that is
-expected until you write the code.
+Las siete pruebas deben pasar. Cinco comprueban tu `choose_move` / `order_moves`:
+legalidad, aprovechar una victoria inmediata, bloquear una amenaza inmediata y respetar
+el tiempo permitido. Las otras dos usan el motor proporcionado y son el objetivo de la semana;
+se explican abajo. Las pruebas que dependen de la plantilla muestran `not implemented yet`
+mientras no completes las funciones; es lo esperado.
 
-**Fast-finishing pairs:** the biggest cheap win is a *dynamic* order — put the
-previous iteration's best move first. Add a transposition table only after that.
-Do not over-engineer the evaluation before you have depth: *depth beats
-knowledge at this scale* is a result you will watch happen in the bracket.
+**Para las parejas que terminen pronto:** la mayor mejora de bajo costo es un orden *dinámico*:
+prueba primero la mejor jugada de la iteración anterior. Añade una tabla de transposiciones después.
+No compliques la evaluación antes de lograr profundidad: *a esta escala, la profundidad supera
+al conocimiento* es un resultado que observarás en las partidas.
 
-## The two guarantee tests (why they matter)
+## Las dos pruebas de garantías y por qué importan
 
-1. **`test_alphabeta_matches_minimax_value_with_fewer_nodes`** — α-β returns the
-   **identical** value minimax returns while expanding **strictly fewer** nodes.
-   From the notebook, at the two-center-discs position:
+1. **`test_alphabeta_matches_minimax_value_with_fewer_nodes`** — α-β devuelve el valor
+   **idéntico** al de minimax mientras visita **estrictamente menos** nodos.
+   En la posición del notebook con dos fichas en la columna central:
 
-   | depth | minimax nodes | α-β nodes | speed-up |
+   | profundidad | nodos de minimax | nodos de α-β | aceleración |
    |---|---|---|---|
    | 2 | 57 | 45 | 1.3× |
    | 4 | 2,801 | 1,002 | 2.8× |
    | 5 | 19,607 | 4,103 | 4.8× |
    | 6 | 132,179 | 17,030 | 7.8× |
 
-   Pruning is **not** approximation — it discards only provably irrelevant
-   branches. Same answer, a fraction of the cost.
+   La poda **no** es una aproximación: descarta solo ramas demostrablemente irrelevantes.
+   La misma respuesta, a una fracción del costo.
 
-2. **`test_horizon_effect_shallow_agent_loses`** — a guarantee *failing* on
-   purpose. `play(2, 5)` → the depth-5 side wins; `play(6, 4)` → the depth-6 side
-   wins. The shallow agent is not blundering — **every move it plays is optimal
-   with respect to its horizon.** It simply cannot see the threat that resolves
-   one ply past where it stopped looking. No evaluation function fixes this; only
-   depth does. (The notebook's `play(5, 5)` → second player wins is an *artifact*
-   of `evaluate()` at equal depth, not the horizon effect, so the test does not
-   assert on it — ask yourself why before class.)
+2. **`test_horizon_effect_shallow_agent_loses`** — observa deliberadamente el *fallo* de una garantía.
+   `play(2, 5)` → gana el jugador de profundidad 5; `play(6, 4)` → gana el de profundidad 6.
+   El agente menos profundo no comete un error de cálculo: **cada jugada es óptima con respecto
+   a su horizonte.** Simplemente no ve una amenaza que se resuelve una media jugada más allá
+   de donde dejó de buscar. Ninguna función de evaluación soluciona esto; la profundidad sí.
+   En el notebook, `play(5, 5)` también da la victoria al segundo jugador, pero es un *efecto particular*
+   de `evaluate()` con igual profundidad, no el efecto horizonte. Por eso la prueba no exige
+   ese resultado; pregúntate por qué antes de la clase.
 
-## Session 5B — in class (80 min)
+## Sesión 5B — En clase (80 min)
 
-**Setup (10 min).** The round-robin driver runs live with the bracket on screen;
-every pair plays every other pair, both colors. While it runs, each pair gives a
-30-second description of its evaluation function.
+**Preparación (10 min).** El programa de todos contra todos se ejecuta en vivo con el cuadro del torneo en pantalla.
+Cada pareja juega contra todas las demás, con ambos colores. Mientras se ejecuta, cada pareja
+describe su función de evaluación en 30 segundos.
 
-**Rounds + commentary (35 min).** Predict winners before each match; when an
-agent loses, its authors explain what happened. Watch for the three recurring
-results: a *simpler* agent that searched two plies deeper beats a sophisticated
-one; a fixed-depth agent times out and **forfeits** (iterative deepening is what
-prevents this); an agent that is stronger as MAX than MIN has an asymmetry bug.
+**Rondas y comentarios (35 min).** Predigan los ganadores antes de cada partida; cuando un
+agente pierda, sus autores explican qué ocurrió. Observa tres resultados recurrentes:
+un agente *más simple* que busca dos medias jugadas más profundo vence a uno sofisticado;
+un agente de profundidad fija agota el tiempo y **pierde por ello**, algo que busca evitar la profundización
+iterativa; un agente más fuerte como MAX que como MIN tiene un error de asimetría.
 
-**The LLM challenger (20 min).** An LLM agent enters the bracket with the plan's
-prompt (`{board}` rendered by `Connect4.__str__`, `{legal}` from `legal_moves()`):
+**El LLM retador (20 min).** Un agente LLM entra al torneo con el prompt del plan:
+`{board}` se obtiene mediante `Connect4.__str__` y `{legal}`, mediante `legal_moves()`.
 
 ```python
 from aicourse.llm import LLM
@@ -110,23 +110,23 @@ Reply with one column number and nothing else."""
 reply = model.complete(PROMPT.format(board=str(board), legal=board.legal_moves()))
 ```
 
-Expect it to: play legal moves *most* of the time (validate + retry the rest);
-**miss immediate wins** (col 3 wins now and it plays elsewhere — it is not
-searching); fail to block immediate threats; and run ~100× slower than the α-β
-agent. Every missed-immediate-win board is a Failure Atlas entry — record the
-**exact** board state so it reproduces.
+Cabe esperar que haga jugadas legales *la mayor parte* del tiempo: valida y reintenta las restantes;
+que **pierda oportunidades de victoria inmediata**, como no elegir la columna 3 cuando gana en ese momento,
+porque no está buscando; que no bloquee amenazas inmediatas; y que tarde unas 100 veces más que el agente α-β.
+Cada tablero con una victoria inmediata desaprovechada es una entrada del Atlas de Fallos:
+registra el estado **exacto** para poder reproducirlo.
 
-**Debrief (15 min).** α-β returns *exactly* minimax's answer while exploring far
-less — pruning is free, not an approximation. Move ordering is a heuristic about
-search *order* and it doubles reachable depth. The LLM lost to a 40-line agent at
-a game it has seen thousands of times: **pattern-matching a game's description is
-not computing in it.** Reconcile that with Ruoss et al. (2024) — grandmaster
-chess with no search at inference — and land the answer: *the search did not
-disappear; it moved to training time.*
+**Puesta en común (15 min).** α-β devuelve *exactamente* la respuesta de minimax explorando
+mucho menos: la poda no es una aproximación. Ordenar jugadas es una heurística sobre el *orden*
+de búsqueda y duplica la profundidad alcanzable. El LLM perdió contra un agente de 40 líneas en
+un juego que ha visto miles de veces: **reconocer patrones en la descripción de un juego no equivale
+a calcular sus jugadas.** Relaciona ese resultado con Ruoss y colaboradores (2024): ajedrez de nivel
+gran maestro sin búsqueda durante la inferencia. La conclusión es que *la búsqueda no desapareció:
+se trasladó al entrenamiento.*
 
-## Links
+## Enlaces
 
-- Session A notebook — [`../../notebooks/week-05-minimax-alphabeta.ipynb`](../../notebooks/week-05-minimax-alphabeta.ipynb)
-- Slides — [`../../slides/week-05/deck.md`](../../slides/week-05/deck.md)
-- Lesson plan (tournament rules, Session 5A "Assignment") — [`../../weeks/week-05.md`](../../weeks/week-05.md)
-- AI policy (`AI_LOG.md`) — [`../../resources/ai-policy.md`](../../resources/ai-policy.md)
+- Notebook de la sesión A — [`../../notebooks/week-05-minimax-alphabeta.ipynb`](../../notebooks/week-05-minimax-alphabeta.ipynb)
+- Diapositivas — [`../../slides/week-05/deck.md`](../../slides/week-05/deck.md)
+- Plan de clase y reglas del torneo, sección «Tarea» de la sesión 5A — [`../../weeks/week-05.md`](../../weeks/week-05.md)
+- Política de IA (`AI_LOG.md`) — [`../../resources/ai-policy.md`](../../resources/ai-policy.md)

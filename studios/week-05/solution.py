@@ -1,68 +1,88 @@
-"""Week 5 studio — REFERENCE SOLUTION (instructor-only).
+"""Taller de la semana 5 — SOLUCIÓN DE REFERENCIA (solo para el docente).
 
-A filled-in copy of ``starter.py``: identical function names and signatures, so
-the *provided* ``test_alphabeta.py`` passes when this module is imported in place
-of ``starter``. Verify with ``studios/_verify_solutions.py`` (which aliases this
-file to the name ``starter`` and runs the unmodified test).
+Versión completada de ``starter.py``: conserva nombres y firmas para que
+``test_alphabeta.py`` pase si se importa como ``starter``. El material
+describe ``studios/_verify_solutions.py`` como verificador que registra este
+archivo con ese nombre y ejecuta las pruebas sin modificarlas.
 
-DO NOT ship this to students — it is excluded via ``studios/.gitignore``. The
-teaching walkthrough lives in ``solution.ipynb`` (which imports this file rather
-than re-pasting it, so the two never drift).
+NO distribuir a estudiantes: se excluye mediante ``studios/.gitignore``.
+La explicación está en ``solution.ipynb``, que importa este archivo sin copiarlo.
 
-The whole trick of the tournament agent is *iterative deepening*: search depth 1,
-then 2, then 3, ..., always keeping the best move from the last COMPLETED depth,
-and stopping when the clock runs out. That is what turns α-β into a time-bounded
-anytime agent — the single thing that most often decides the bracket.
+La idea central es la profundización iterativa: buscar a profundidad 1, 2, 3,
+etc., conservar la mejor jugada de la última profundidad COMPLETADA y detenerse
+al agotar el tiempo. Esto permite mantener una respuesta disponible mientras
+se intenta mejorarla, una característica decisiva en el torneo.
 """
 import time
 from math import inf
 
+# Connect4 es la clase del tablero; alphabeta es una función que recibe ese objeto y lo explora.
+# order_moves y choose_move son funciones, no métodos de una clase de agente.
 from connect4 import Connect4, alphabeta, MAX, CENTER_FIRST
 
 
+# board es una instancia de Connect4; board.legal_moves() consulta su estado mediante un método.
+# Ordenar las alternativas no coloca fichas ni modifica el tablero.
 def order_moves(board):
-    """Return this board's legal columns in the order α-β should try them.
+    """Devuelve las columnas legales en el orden en que alfa-beta debe probarlas.
 
-    Center-first (``CENTER_FIRST``) is a strong *static* order for Connect-4 —
-    central columns take part in more winning lines — so we simply filter the
-    static priority list down to the columns that are actually playable. This
-    is a legal permutation of ``board.legal_moves()``.
+    El orden estático ``CENTER_FIRST`` es fuerte en Conecta 4: las columnas
+    centrales participan en más líneas ganadoras. Filtra esa lista para
+    conservar las columnas jugables. Es una permutación de ``board.legal_moves()``.
     """
+    # Comprensión de lista: recorre la prioridad estática y elimina las columnas llenas.
+    # Devuelve una lista nueva; CENTER_FIRST y las casillas del tablero no cambian.
     return [c for c in CENTER_FIRST if c in board.legal_moves()]
 
 
+# El agente devuelve un índice de columna, no un tablero ni una evaluación.
+# -> int es una anotación de tipo; Python no comprueba automáticamente ese contrato al ejecutar.
+# Esta interfaz supone que quedan jugadas legales y evalúa siempre desde la perspectiva de MAX.
 def choose_move(board, time_budget_ms) -> int:
-    """Return the column MAX should play, using iterative deepening + α-β.
+    """Devuelve la columna que debe jugar MAX con profundización iterativa y alfa-beta.
 
-    Contract (the tournament relies on all three):
-      1. ALWAYS return a legal column, even if the budget is tiny — seed `best`
-         with a legal move before the loop so you never return None.
-      2. Never exceed `time_budget_ms` by much — check the clock between depths
-         and stop; do not start a depth you cannot afford.
-      3. Keep the best move from the last COMPLETED depth.
+    Contrato del torneo:
+      1. Devolver SIEMPRE una columna legal incluso con poco tiempo: inicializa
+         `best` con una jugada legal antes del bucle para no devolver None.
+      2. No exceder mucho `time_budget_ms`: comprobar el reloj entre profundidades
+         y detenerse cuando se agote el presupuesto.
+      3. Conservar la mejor jugada de la última profundidad COMPLETADA, no una
+         estimación parcial de una iteración sin terminar.
 
-    We also apply the cheap dynamic-ordering trick the README recommends: after
-    each completed depth, move the best column to the front of the order so the
-    next (deeper) iteration examines it first and prunes harder.
+    Tras cada profundidad completada, pone su mejor columna al inicio del
+    orden para que la siguiente iteración la examine primero y pode más.
     """
+    # perf_counter mide segundos; divide los milisegundos entre 1000 para calcular el instante límite.
     deadline = time.perf_counter() + time_budget_ms / 1000.0
     order = order_moves(board)
-    best = order[0]                       # rule 1: always have a legal move
+    # Guarda una respuesta disponible antes de buscar. Supone que order no está vacía.
+    best = order[0]                       # regla 1: disponer siempre de una jugada legal
+    # Prueba límites 1 a 42, máximo de fichas del tablero completo. Cada iteración vuelve a buscar desde la raíz.
     for depth in range(1, 43):
+        # El reloj se comprueba SOLO entre profundidades. La llamada siguiente a alphabeta no recibe
+        # deadline ni puede interrumpirse por tiempo aquí, así que una iteración larga puede sobrepasarlo.
+        # Este comentario explica la implementación existente; no añade un control temporal nuevo.
         if time.perf_counter() >= deadline:
             break
+        # -inf e inf dejan inicialmente abierta la ventana de poda; [0] es un contador mutable nuevo.
+        # La búsqueda coloca y deshace fichas sobre el objeto board sin copiarlo por cada rama.
         value, move = alphabeta(board, depth, MAX, -inf, inf, [0], order)
+        # Solo actualiza best después de que alphabeta regrese con la profundidad completa.
         if move is not None:
-            best = move                   # rule 3: last completed depth wins
-            # dynamic ordering: try last iteration's best move first next time
+            best = move                   # regla 3: conservar la última profundidad completada
+            # orden dinámico: en la siguiente iteración, prueba primero la mejor jugada anterior
+            # Construye una lista nueva con best al frente y las demás columnas sin duplicarla.
             order = [best] + [c for c in order if c != best]
+    # Entrega la última jugada disponible incluso si no hubo tiempo para la primera búsqueda.
     return best
 
 
+# Esta prueba básica se ejecuta al lanzar el archivo; importarlo no ejecuta este bloque.
 if __name__ == "__main__":
-    # Quick smoke test: choose a move on the opening position under a 500 ms budget.
+    # Prueba básica: elige una jugada en una posición inicial con un presupuesto de 500 ms.
+    # Instanciación: b contiene sus propias casillas, alturas y registro de última jugada.
     b = Connect4()
-    b.push(3, MAX)          # suppose MIN opened center; MAX replies
+    b.push(3, MAX)          # coloca una ficha MAX en el centro antes de elegir la jugada
     t0 = time.perf_counter()
     move = choose_move(b, 500)
     dt = (time.perf_counter() - t0) * 1000
